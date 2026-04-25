@@ -35,26 +35,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 xhr.addEventListener('load', function() {
-                    if (xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.success) {
-                            progressBar.style.width = '100%';
-                            setTimeout(() => {
-                                uploadProgress.style.display = 'none';
-                                showAlert('File uploaded successfully!', 'success');
-                                uploadForm.reset();
-                                const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
-                                modal.hide();
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 1000);
-                            }, 500);
-                        } else {
-                            showAlert(response.message || 'Upload failed', 'danger');
+                    let response = {};
+                    try { response = JSON.parse(xhr.responseText); } catch (_) {}
+
+                    // Treat any 2xx status as success (route returns 201 Created)
+                    if (xhr.status >= 200 && xhr.status < 300 && response.success) {
+                        progressBar.style.width = '100%';
+                        setTimeout(() => {
                             uploadProgress.style.display = 'none';
-                        }
+                            showAlert('File uploaded successfully!', 'success');
+                            uploadForm.reset();
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+                            modal.hide();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }, 500);
                     } else {
-                        showAlert('Upload failed. Please try again.', 'danger');
+                        const msg = response.message || 'Upload failed. Please try again.';
+                        showAlert(msg, 'danger');
                         uploadProgress.style.display = 'none';
                     }
                 });

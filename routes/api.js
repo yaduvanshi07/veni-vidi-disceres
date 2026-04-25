@@ -7,226 +7,46 @@ const { enhancedChat } = require('../utils/enhancedChatbot');
 const { trackQuestion } = require('../utils/analytics');
 const { getModel } = require('../utils/getGeminiModel');
 
-// Apply auth middleware
 router.use(requireAuth);
 
-// Enhanced chat endpoint
-router.post('/chat', async (req, res) => {
-  try {
-    const { message, documentIds } = req.body;
-
-    if (!message || !message.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Message is required'
-      });
-    }
-
-    const docIds = documentIds || [];
-    
-    // Use enhanced chat if multiple documents
-    if (docIds.length > 1) {
-      const result = await enhancedChat(req.session.userId, message, docIds);
-      
-      // Track question
-      await trackQuestion(req.session.userId, message, docIds[0], null, null);
-      
-      res.json({
-        success: true,
-        response: result.response,
-        enhancedFeatures: result.enhancedFeatures
-      });
-      return;
-    }
-    
-    // Single document chat (original behavior)
-    if (docIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'At least one document ID is required'
-      });
-    }
-
-    const documentId = docIds[0];
-    
-    // Get document
-    const document = await Document.findOne({
-      _id: documentId,
-      userId: req.session.userId
-    });
-
-    if (!document) {
-      return res.status(404).json({
-        success: false,
-        message: 'Document not found'
-      });
-    }
-
-    // Ensure document is parsed
-    if (!document.isParsed || !document.extractedText) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please parse the document first'
-      });
-    }
-
-    // Track question
-    await trackQuestion(req.session.userId, message, documentId, document.topics?.[0], document.subject);
-
-    // Try enhanced chat first
-    try {
-      const result = await enhancedChat(req.session.userId, message, [documentId]);
-      
-      // Add to chat history
-      document.chatHistory.push({
-        role: 'user',
-        content: message
-      });
-      document.chatHistory.push({
-        role: 'assistant',
-        content: result.response
-      });
-      await document.save();
-      
-      res.json({
-        success: true,
-        response: result.response,
-        chatHistory: document.chatHistory,
-        enhancedFeatures: result.enhancedFeatures
-      });
-      return;
-    } catch (enhancedError) {
-      console.log('Enhanced chat failed, using standard chat');
-    }
-
-    // Fallback to standard chat
-    document.chatHistory.push({
-      role: 'user',
-      content: message
-    });
-
-    // Get model
-    const model = getModel();
-
-    // Create context prompt
-    const contextPrompt = `You are a helpful assistant analyzing a document. Here is the document content:
-
-${document.extractedText}
-
-Please answer the user's question based on the document content above. If the question cannot be answered from the document, politely say so.`;
-
-    // Generate response
-    const result = await model.generateContent(contextPrompt + '\n\nUser question: ' + message);
-    const response = await result.response;
-    const assistantMessage = response.text();
-
-    // Add assistant message to chat history
-    document.chatHistory.push({
-      role: 'assistant',
-      content: assistantMessage
-    });
-
-    // Save updated chat history
-    await document.save();
-
-    res.json({
-      success: true,
-      response: assistantMessage,
-      chatHistory: document.chatHistory
-    });
-  } catch (error) {
-    console.error('Chat error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to process chat message',
-      error: error.message
-    });
-  }
-});
-
-// Legacy single document chat endpoint (for backward compatibility)
-router.post('/chat/:documentId', async (req, res) => {
-  req.body.documentIds = [req.params.documentId];
-  // Call the enhanced chat handler
-  const { message } = req.body;
-  const documentId = req.params.documentId;
-
-  if (!message || !message.trim()) {
-    return res.status(400).json({
-      success: false,
-      message: 'Message is required'
-    });
-  }
-
-  // Get document
-  const document = await Document.findOne({
-    _id: documentId,
-    userId: req.session.userId
-  });
+// ── Shared chat logic ─────────────────────────────────────────────────────────
+async function handleSingleDocChat(userId, message, documentId, res) {
+  const document = await Document.findOne({ _id: documentId, userId });
 
   if (!document) {
-    return res.status(404).json({
-      success: false,
-      message: 'Document not found'
-    });
+    return res.status(404).json({ success: false, message: 'Document not found' });
   }
-
   if (!document.isParsed || !document.extractedText) {
-    return res.status(400).json({
-      success: false,
-      message: 'Please parse the document first'
-    });
+    return res.status(400).json({ success: false, message: 'Please parse the document first' });
   }
 
-  // Track question
-  await trackQuestion(req.session.userId, message, documentId, document.topics?.[0], document.subject);
+  await trackQuestion(userId, message, documentId, document.topics?.[0], document.subject).catch(() => {});
 
-  // Try enhanced chat
+  // Try enhanced chat first, fall back gracefully
   try {
-    const result = await enhancedChat(req.session.userId, message, [documentId]);
-    
-    document.chatHistory.push({
-      role: 'user',
-      content: message
-    });
-    document.chatHistory.push({
-      role: 'assistant',
-      content: result.response
-    });
+    const result = await enhancedChat(userId, message, [documentId]);
+    document.chatHistory.push({ role: 'user', content: message });
+    document.chatHistory.push({ role: 'assistant', content: result.response });
     await document.save();
-    
     return res.json({
       success: true,
       response: result.response,
       chatHistory: document.chatHistory,
       enhancedFeatures: result.enhancedFeatures
     });
-  } catch (enhancedError) {
-    console.log('Enhanced chat failed, using standard chat');
+  } catch (_enhancedErr) {
+    console.warn('[API] Enhanced chat failed, falling back to standard chat');
   }
 
-  // Fallback to standard
-  document.chatHistory.push({
-    role: 'user',
-    content: message
-  });
-
+  // Standard chat fallback
   const model = getModel();
-  const contextPrompt = `You are a helpful assistant analyzing a document. Here is the document content:
+  const contextPrompt = `You are a helpful study assistant. Analyze the following document and answer the user's question based strictly on its content. If the answer is not in the document, say so politely.\n\nDOCUMENT:\n${document.extractedText}\n\nQUESTION: ${message}`;
 
-${document.extractedText}
+  const result = await model.generateContent(contextPrompt);
+  const assistantMessage = result.response.text();
 
-Please answer the user's question based on the document content above. If the question cannot be answered from the document, politely say so.`;
-
-  const result = await model.generateContent(contextPrompt + '\n\nUser question: ' + message);
-  const response = await result.response;
-  const assistantMessage = response.text();
-
-  document.chatHistory.push({
-    role: 'assistant',
-    content: assistantMessage
-  });
-
+  document.chatHistory.push({ role: 'user', content: message });
+  document.chatHistory.push({ role: 'assistant', content: assistantMessage });
   await document.save();
 
   return res.json({
@@ -234,71 +54,104 @@ Please answer the user's question based on the document content above. If the qu
     response: assistantMessage,
     chatHistory: document.chatHistory
   });
+}
+
+// ── POST /api/chat ────────────────────────────────────────────────────────────
+router.post('/chat', async (req, res) => {
+  try {
+    const { message, documentIds } = req.body;
+    const userId = req.session.userId;
+
+    if (!message?.trim()) {
+      return res.status(400).json({ success: false, message: 'Message is required' });
+    }
+
+    const docIds = Array.isArray(documentIds) ? documentIds : [];
+
+    if (docIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'At least one document ID is required' });
+    }
+
+    // Multi-document enhanced chat
+    if (docIds.length > 1) {
+      const result = await enhancedChat(userId, message, docIds);
+      await trackQuestion(userId, message, docIds[0], null, null).catch(() => {});
+      return res.json({
+        success: true,
+        response: result.response,
+        enhancedFeatures: result.enhancedFeatures
+      });
+    }
+
+    // Single document
+    return handleSingleDocChat(userId, message, docIds[0], res);
+  } catch (error) {
+    console.error('[API] Chat error:', error);
+    res.status(500).json({ success: false, message: 'Failed to process chat message' });
+  }
 });
 
-// Get parsed text status
+// ── POST /api/chat/:documentId (legacy) ──────────────────────────────────────
+router.post('/chat/:documentId', async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message?.trim()) {
+      return res.status(400).json({ success: false, message: 'Message is required' });
+    }
+    return handleSingleDocChat(req.session.userId, message, req.params.documentId, res);
+  } catch (error) {
+    console.error('[API] Legacy chat error:', error);
+    res.status(500).json({ success: false, message: 'Failed to process chat message' });
+  }
+});
+
+// ── GET /api/parse-status/:documentId ────────────────────────────────────────
 router.get('/parse-status/:documentId', async (req, res) => {
   try {
     const document = await Document.findOne({
       _id: req.params.documentId,
       userId: req.session.userId
-    });
+    }).select('isParsed parsedAt extractedText');
 
     if (!document) {
-      return res.status(404).json({
-        success: false,
-        message: 'Document not found'
-      });
+      return res.status(404).json({ success: false, message: 'Document not found' });
     }
 
     res.json({
       success: true,
       isParsed: document.isParsed,
-      extractedText: document.extractedText,
+      extractedTextLength: document.extractedText?.length || 0,
       parsedAt: document.parsedAt
     });
   } catch (error) {
-    console.error('Parse status error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get parse status'
-    });
+    console.error('[API] Parse status error:', error);
+    res.status(500).json({ success: false, message: 'Failed to get parse status' });
   }
 });
 
-// Download extracted text
+// ── GET /api/download-text/:documentId ───────────────────────────────────────
 router.get('/download-text/:documentId', async (req, res) => {
   try {
     const document = await Document.findOne({
       _id: req.params.documentId,
       userId: req.session.userId
-    });
+    }).select('originalName extractedText');
 
     if (!document) {
-      return res.status(404).json({
-        success: false,
-        message: 'Document not found'
-      });
+      return res.status(404).json({ success: false, message: 'Document not found' });
     }
-
     if (!document.extractedText) {
-      return res.status(400).json({
-        success: false,
-        message: 'No extracted text available'
-      });
+      return res.status(400).json({ success: false, message: 'No extracted text available' });
     }
 
-    res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Disposition', `attachment; filename="${document.originalName}_extracted.txt"`);
+    const safeName = document.originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeName}_extracted.txt"`);
     res.send(document.extractedText);
   } catch (error) {
-    console.error('Download error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to download text'
-    });
+    console.error('[API] Download error:', error);
+    res.status(500).json({ success: false, message: 'Failed to download text' });
   }
 });
 
 module.exports = router;
-
