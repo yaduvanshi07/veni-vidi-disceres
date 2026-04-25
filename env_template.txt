@@ -1,7 +1,0 @@
-PORT=3000
-NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/document-assistant
-SESSION_SECRET=your-session-secret-here-minimum-32-characters
-GEMINI_API_KEY=your-gemini-api-key-here
-GEMINI_MODEL_NAME=gemini-1.5-flash
-
