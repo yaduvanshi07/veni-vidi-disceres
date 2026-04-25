@@ -1,0 +1,408 @@
+<%- include('partials/header', { title: 'Dashboard' , user: user }) %>
+
+    <main class="container my-5">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="h2 fw-bold mb-1 text-dark" style="font-family: 'Cinzel', serif;">
+                    Dashboard
+                </h1>
+                <p class="text-muted mb-0">Welcome back, <span class="text-saffron fw-bold">
+                        <%= user.username %>
+                    </span>!</p>
+            </div>
+            <button class="btn btn-pill-gradient text-white btn-lg shadow-sm px-4" data-bs-toggle="modal"
+                data-bs-target="#uploadModal">
+                <i class="bi bi-cloud-upload me-2"></i>Upload New
+            </button>
+        </div>
+
+        <!-- Analytics Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card glass-card h-100 border-0 shadow-sm analytics-card">
+                    <div class="card-body p-4 position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                            <i class="bi bi-folder-fill display-1 text-primary"></i>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-start mb-3 position-relative z-1">
+                            <div>
+                                <h6 class="text-uppercase small fw-bold text-muted mb-2 tracking-wide">Total Documents
+                                </h6>
+                                <h2 class="mb-0 fw-bold display-6 text-dark">
+                                    <%= analytics.totalDocuments %>
+                                </h2>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-folder-fill text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mt-3">
+                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                                <i class="bi bi-arrow-up-short me-1"></i>All Files
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card glass-card h-100 border-0 shadow-sm analytics-card">
+                    <div class="card-body p-4 position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                            <i class="bi bi-file-text-fill display-1 text-success"></i>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-start mb-3 position-relative z-1">
+                            <div>
+                                <h6 class="text-uppercase small fw-bold text-muted mb-2 tracking-wide">Parsed Documents
+                                </h6>
+                                <h2 class="mb-0 fw-bold display-6 text-dark">
+                                    <%= analytics.parsedDocuments %>
+                                </h2>
+                            </div>
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-file-text-fill text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mt-3">
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                                <i class="bi bi-check-lg me-1"></i>Ready to Study
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card glass-card h-100 border-0 shadow-sm analytics-card">
+                    <div class="card-body p-4 position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                            <i class="bi bi-chat-dots-fill display-1 text-aqua"></i>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-start mb-3 position-relative z-1">
+                            <div>
+                                <h6 class="text-uppercase small fw-bold text-muted mb-2 tracking-wide">AI Queries</h6>
+                                <h2 class="mb-0 fw-bold display-6 text-dark">
+                                    <%= analytics.totalChatQueries %>
+                                </h2>
+                            </div>
+                            <div class="bg-aqua bg-opacity-10 rounded-3 p-3">
+                                <i class="bi bi-chat-dots-fill text-aqua fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mt-3">
+                            <span class="badge bg-aqua bg-opacity-10 text-dark rounded-pill px-3 py-2">
+                                <i class="bi bi-stars me-1"></i>AI Powered
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="card glass-card border-0 shadow-sm mb-5 overflow-hidden">
+            <div class="card-header bg-gradient-saffron text-white border-0 py-4 px-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1 fw-bold text-white">
+                            <i class="bi bi-person-circle me-2"></i>Profile Information
+                        </h5>
+                        <p class="text-white-50 small mb-0">Manage your personal details and settings</p>
+                    </div>
+                    <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm fw-bold text-saffron"
+                        data-bs-toggle="modal" data-bs-target="#profileModal">
+                        <i class="bi bi-pencil-square me-1"></i>Edit Profile
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-6 border-end-md">
+                        <div class="d-flex align-items-center mb-4 p-3 rounded-3 bg-light bg-opacity-50">
+                            <div class="bg-primary bg-opacity-10 rounded-3 p-3 me-3">
+                                <i class="bi bi-person text-primary fs-4"></i>
+                            </div>
+                            <div>
+                                <p class="text-uppercase small fw-bold text-muted mb-0 tracking-wide">Username</p>
+                                <p class="mb-0 fw-bold text-dark fs-5">
+                                    <%= userProfile.username %>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center p-3 rounded-3 bg-light bg-opacity-50">
+                            <div class="bg-info bg-opacity-10 rounded-3 p-3 me-3">
+                                <i class="bi bi-envelope text-info fs-4"></i>
+                            </div>
+                            <div>
+                                <p class="text-uppercase small fw-bold text-muted mb-0 tracking-wide">Email</p>
+                                <p class="mb-0 fw-bold text-dark fs-5">
+                                    <%= userProfile.email %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 ps-md-4">
+                        <div class="d-flex align-items-center mb-4 p-3 rounded-3 bg-light bg-opacity-50">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-3 me-3">
+                                <i class="bi bi-person-badge text-success fs-4"></i>
+                            </div>
+                            <div>
+                                <p class="text-uppercase small fw-bold text-muted mb-0 tracking-wide">Full Name</p>
+                                <p class="mb-0 fw-bold text-dark fs-5">
+                                    <%= userProfile.profile && userProfile.profile.firstName ?
+                                        userProfile.profile.firstName + ' ' + (userProfile.profile.lastName || '' )
+                                        : 'Not set' %>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center p-3 rounded-3 bg-light bg-opacity-50">
+                            <div class="bg-warning bg-opacity-10 rounded-3 p-3 me-3">
+                                <i class="bi bi-card-text text-warning fs-4"></i>
+                            </div>
+                            <div>
+                                <p class="text-uppercase small fw-bold text-muted mb-0 tracking-wide">Bio</p>
+                                <p class="mb-0 fst-italic text-dark text-opacity-75">
+                                    "<%= userProfile.profile && userProfile.profile.bio ? userProfile.profile.bio
+                                        : 'Not set' %>"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Documents -->
+        <div class="card glass-card border-0 shadow-sm mb-5">
+            <div
+                class="card-header bg-transparent border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1 fw-bold text-dark">
+                        <i class="bi bi-clock-history me-2 text-saffron"></i>Recent Activity
+                    </h5>
+                    <p class="text-muted small mb-0">Your latest uploaded materials</p>
+                </div>
+                <a href="/documents/all" class="btn btn-outline-primary rounded-pill btn-sm px-3">
+                    View Library <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-4">
+                <% if (documents.length===0) { %>
+                    <div class="text-center py-5">
+                        <div class="mb-4 opacity-50">
+                            <i class="bi bi-folder2-open display-1 text-muted"></i>
+                        </div>
+                        <h5 class="text-dark fw-bold mb-2">Your library is empty</h5>
+                        <p class="text-muted mb-4">Start building your knowledge base today.</p>
+                        <button class="btn btn-pill-gradient text-white btn-lg shadow-sm px-4" data-bs-toggle="modal"
+                            data-bs-target="#uploadModal">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload First Document
+                        </button>
+                    </div>
+                    <% } else { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light bg-opacity-50 text-uppercase small text-muted">
+                                    <tr>
+                                        <th class="border-0 py-3 ps-3 rounded-start">Document Name</th>
+                                        <th class="border-0 py-3">Type</th>
+                                        <th class="border-0 py-3">Category</th>
+                                        <th class="border-0 py-3">Status</th>
+                                        <th class="border-0 py-3">Uploaded</th>
+                                        <th class="border-0 py-3 pe-3 text-end rounded-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% documents.forEach(doc=> { %>
+                                        <tr class="search-result-row">
+                                            <td class="ps-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-white rounded-3 shadow-sm p-2 me-3 border">
+                                                        <% if (doc.fileType==='pdf' ) { %>
+                                                            <i class="bi bi-file-earmark-pdf text-danger fs-5"></i>
+                                                            <% } else if (doc.fileType==='image' ) { %>
+                                                                <i
+                                                                    class="bi bi-file-earmark-image text-success fs-5"></i>
+                                                                <% } else { %>
+                                                                    <i
+                                                                        class="bi bi-file-earmark-text text-primary fs-5"></i>
+                                                                    <% } %>
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-0 fw-semibold text-dark text-truncate"
+                                                            style="max-width: 200px;">
+                                                            <%= doc.originalName %>
+                                                        </p>
+                                                        <small class="text-muted">
+                                                            <%= (doc.fileSize / 1024).toFixed(2) %> KB
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border">
+                                                    <%= doc.fileType.toUpperCase() %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info bg-opacity-10 text-info">
+                                                    <%= doc.category %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <% if (doc.isParsed) { %>
+                                                    <span
+                                                        class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">
+                                                        <i class="bi bi-check-circle-fill me-1"></i>Parsed
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span
+                                                            class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2">
+                                                            <i class="bi bi-hourglass-split me-1"></i>Processing
+                                                        </span>
+                                                        <% } %>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted fw-medium">
+                                                    <%= new Date(doc.uploadDate).toLocaleDateString() %>
+                                                </small>
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <a href="/documents/<%= doc._id %>"
+                                                    class="btn btn-sm btn-light text-primary border shadow-sm rounded-pill px-3">
+                                                    Open <i class="bi bi-arrow-up-right-square ms-1"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <% } %>
+            </div>
+        </div>
+        <!-- Unlocked Resources -->
+        <% if (userProfile.purchasedDocuments && userProfile.purchasedDocuments.length> 0) { %>
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+                    <h5 class="mb-1 fw-bold">
+                        <i class="bi bi-unlock-fill me-2 text-success"></i>Unlocked Resources
+                    </h5>
+                    <p class="text-muted small mb-0">Premium content you have purchased</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <% userProfile.purchasedDocuments.forEach(doc=> { %>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <span class="badge bg-success mb-2">Premium Unlocked</span>
+                                        <h6 class="fw-bold mb-2 text-truncate">
+                                            <%= doc.originalName %>
+                                        </h6>
+                                        <p class="small text-muted mb-3">
+                                            <%= doc.description || 'No description' %>
+                                        </p>
+                                        <a href="/documents/<%= doc._id %>"
+                                            class="btn btn-sm btn-outline-primary w-100">
+                                            View Document
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+    </main>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-gradient-primary text-white border-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="document" class="form-label fw-semibold">
+                                <i class="bi bi-file-earmark me-2 text-primary"></i>Select File
+                            </label>
+                            <input type="file" class="form-control form-control-lg" id="document" name="document"
+                                accept=".pdf,.jpg,.jpeg,.png,.docx" required>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>Supported: PDF, JPG, PNG, DOCX (Max 10MB)
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="category" class="form-label fw-semibold">
+                                <i class="bi bi-folder me-2 text-primary"></i>Category
+                            </label>
+                            <select class="form-select form-select-lg" id="category" name="category">
+                                <option value="Other">Other</option>
+                                <option value="Notes">Notes</option>
+                                <option value="Reports">Reports</option>
+                                <option value="Certificates">Certificates</option>
+                            </select>
+                        </div>
+                        <div class="progress mb-3" style="display: none;" id="uploadProgress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-gradient-info text-white border-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-person-circle me-2"></i>Edit Profile
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label fw-semibold">
+                                <i class="bi bi-person me-2 text-info"></i>First Name
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="firstName" name="firstName"
+                                value="<%= userProfile.profile && userProfile.profile.firstName ? userProfile.profile.firstName : '' %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label fw-semibold">
+                                <i class="bi bi-person me-2 text-info"></i>Last Name
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="lastName" name="lastName"
+                                value="<%= userProfile.profile && userProfile.profile.lastName ? userProfile.profile.lastName : '' %>">
+                        </div>
+                        <div class="mb-4">
+                            <label for="bio" class="form-label fw-semibold">
+                                <i class="bi bi-info-circle me-2 text-info"></i>Bio
+                            </label>
+                            <textarea class="form-control form-control-lg" id="bio" name="bio" rows="3"
+                                placeholder="Tell us about yourself..."><%= userProfile.profile && userProfile.profile.bio ? userProfile.profile.bio : '' %></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-info btn-lg w-100 text-white">
+                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+    <%- include('partials/footer') %>

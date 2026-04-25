@@ -1,0 +1,266 @@
+<%- include('../partials/header', { title: 'Papers' , user: user }) %>
+
+    <main class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom mb-0">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-saffron">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/institute/<%= institution._id %>/courses"
+                            class="text-decoration-none text-saffron">
+                            <%= institution.name %>
+                        </a></li>
+                    <li class="breadcrumb-item"><a
+                            href="/institute/<%= institution._id %>/course/<%= course._id %>/years"
+                            class="text-decoration-none text-saffron">
+                            <%= course.name %>
+                        </a></li>
+                    <li class="breadcrumb-item"><a
+                            href="/institute/<%= institution._id %>/course/<%= course._id %>/year/<%= year %>/exams"
+                            class="text-decoration-none text-saffron">Year <%= year %></a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <%= examType %>
+                    </li>
+                </ol>
+            </nav>
+
+            <button class="btn btn-pill-gradient text-white btn-lg shadow-sm rounded-pill px-4" data-bs-toggle="modal"
+                data-bs-target="#uploadModal">
+                <i class="bi bi-plus-lg me-2"></i>Add New Paper
+            </button>
+        </div>
+
+        <div class="row g-4">
+            <% if (papers && papers.length> 0) { %>
+                <% papers.forEach(paper=> { %>
+                    <% const isOwner=user && paper.userId && user.id===paper.userId._id.toString(); const
+                        price=paper.price || 50; const isPremium=paper.isPremium || false; %>
+                        <div class="col-md-6 col-lg-3">
+                            <div
+                                class="card glass-card h-100 border-0 p-3 paper-card overflow-hidden position-relative">
+                                <!-- Verification Badge -->
+                                <% if (paper.isVerified) { %>
+                                    <div class="position-absolute top-0 start-0 m-2 badge bg-success shadow-sm"
+                                        style="z-index: 5;">
+                                        <i class="bi bi-patch-check-fill me-1"></i>Verified
+                                    </div>
+                                    <% } %>
+
+                                        <!-- Access Badge -->
+                                        <div class="position-absolute top-0 end-0 m-2 z-1">
+                                            <% if (isOwner) { %>
+                                                <span class="badge bg-primary shadow-sm"><i
+                                                        class="bi bi-person-fill me-1"></i>You</span>
+                                                <% } else if (isPremium) { %>
+                                                    <span class="badge bg-gradient-saffron shadow-sm"><i
+                                                            class="bi bi-gem me-1"></i>Premium</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-success shadow-sm">Free</span>
+                                                        <% } %>
+                                        </div>
+
+                                        <div class="card-body d-flex flex-column h-100 ps-0 pe-0">
+                                            <div class="mb-3 text-center py-4 bg-light rounded-3 position-relative">
+                                                <% if (paper.fileType==='pdf' ) { %>
+                                                    <i
+                                                        class="bi bi-file-earmark-pdf display-4 text-danger opacity-75"></i>
+                                                    <% } else if (paper.fileType==='image' ) { %>
+                                                        <i
+                                                            class="bi bi-file-earmark-image display-4 text-success opacity-75"></i>
+                                                        <% } else { %>
+                                                            <i
+                                                                class="bi bi-file-earmark-text display-4 text-primary opacity-75"></i>
+                                                            <% } %>
+
+                                                                <div
+                                                                    class="position-absolute bottom-0 start-0 w-100 p-2 text-center">
+                                                                    <span
+                                                                        class="badge bg-white text-dark shadow-sm border">
+                                                                        <%= paper.fileType.toUpperCase() %>
+                                                                    </span>
+                                                                </div>
+                                            </div>
+
+                                            <h6 class="fw-bold text-dark text-truncate mb-1"
+                                                title="<%= paper.originalName %>">
+                                                <%= paper.originalName %>
+                                            </h6>
+
+                                            <div class="mb-2 d-flex align-items-center justify-content-between">
+                                                <span class="badge bg-light text-dark border">
+                                                    <i class="bi bi-journal-bookmark me-1"></i>
+                                                    <%= examType %>
+                                                </span>
+                                                <small class="text-muted" style="font-size: 0.75rem;">
+                                                    <%= year %> Year
+                                                </small>
+                                            </div>
+
+                                            <p class="text-muted small mb-3 flex-grow-1">
+                                                <i class="bi bi-person-circle me-1 text-saffron"></i>
+                                                <%= paper.userId ? paper.userId.username : 'Anonymous' %>
+                                                    <br>
+                                                    <span class="opacity-75" style="font-size: 0.75rem;">
+                                                        <%= institution.name %>
+                                                    </span>
+                                            </p>
+
+                                            <div class="mt-auto pt-3 border-top d-grid gap-2">
+                                                <% if (isOwner) { %>
+                                                    <button
+                                                        class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+                                                        <i class="bi bi-pencil-square me-1"></i>Edit Paper
+                                                    </button>
+                                                    <a href="/documents/<%= paper._id %>"
+                                                        class="btn btn-sm btn-ghost border-0 text-primary">
+                                                        View Source <i class="bi bi-arrow-right"></i>
+                                                    </a>
+                                                    <% } else if (isPremium) { %>
+                                                        <button
+                                                            onclick="unlockPaper('<%= paper._id %>', '<%= paper.originalName %>', 50)"
+                                                            class="btn btn-pill-gradient text-white btn-sm shadow-sm fw-bold">
+                                                            <i class="bi bi-lock-fill me-1"></i>Unlock for ₹50
+                                                        </button>
+                                                        <% } else { %>
+                                                            <a href="/documents/<%= paper._id %>"
+                                                                class="btn btn-outline-success btn-sm rounded-pill fw-semibold">
+                                                                <i class="bi bi-eye-fill me-1"></i>View Paper
+                                                            </a>
+                                                            <% } %>
+                                            </div>
+                                        </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                            <% } else { %>
+                                <div class="col-12 text-center py-5">
+                                    <div class="text-muted opacity-50 mb-3">
+                                        <!-- Illustration Placeholder (Icon for now) -->
+                                        <i class="bi bi-folder2-open display-1"></i>
+                                    </div>
+                                    <h4 class="fw-bold text-muted">No papers yet</h4>
+                                    <p class="text-muted mb-4 lead" style="font-size: 1rem;">
+                                        This section becomes richer when students contribute.<br>
+                                        Be the first to share your notes or exam papers.
+                                    </p>
+                                    <button class="btn btn-saffron btn-lg rounded-pill shadow-sm px-5"
+                                        data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                        <i class="bi bi-cloud-plus me-2"></i>Upload First Paper
+                                    </button>
+                                </div>
+                                <% } %>
+        </div>
+    </main>
+
+    <!-- Unlock Modal Redundant? Reusing similar logic or creating a specific one here. -->
+    <!-- We will inject a simple script for handling the demo unlock directly here to avoid route confusion -->
+    <script>
+        function unlockPaper(paperId, paperName, price) {
+            // Use the same demo unlock flow as marketplace
+            if (confirm(`Demo: Unlock "${paperName}" for ₹${price}?`)) {
+
+                // Show loading
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                btn.disabled = true;
+
+                fetch(`/marketplace/unlock/${paperId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Unlocked! Defaulting to dashboard/view.');
+                            window.location.href = `/documents/${paperId}`;
+                        } else {
+                            alert(data.message || 'Failed');
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            }
+        }
+    </script>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-gradient-saffron text-white border-0">
+                    <h5 class="modal-title fw-bold">Upload New Paper</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <input type="hidden" name="institutionId" value="<%= institution._id %>">
+                        <input type="hidden" name="courseId" value="<%= course._id %>">
+                        <input type="hidden" name="year" value="<%= year %>">
+                        <input type="hidden" name="examType" value="<%= examType %>">
+
+                        <div class="mb-3">
+                            <label class="form-label text-dark fw-bold">Paper Name</label>
+                            <input type="text" name="subject" class="form-control"
+                                placeholder="e.g. Data Structures Mid Term" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-dark fw-bold">Exam Date</label>
+                            <input type="date" name="examDate" class="form-control" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-dark fw-bold">File (PDF/Image)</label>
+                            <input type="file" name="document" class="form-control" accept=".pdf,.png,.jpg,.jpeg"
+                                required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-saffron py-2 fw-bold">
+                                <i class="bi bi-cloud-upload me-2"></i>Upload Paper
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            try {
+                const btn = this.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+
+                const response = await fetch('/documents/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Reload to show new paper
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'Upload failed');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>Upload Paper';
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred');
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

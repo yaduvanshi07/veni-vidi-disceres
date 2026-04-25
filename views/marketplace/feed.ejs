@@ -1,0 +1,299 @@
+<%- include('../partials/header', { title: 'Marketplace' , user: user }) %>
+
+    <style>
+        .marketplace-hero {
+            background: linear-gradient(135deg, rgba(255, 243, 224, 0.6) 0%, rgba(224, 247, 250, 0.6) 100%);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .doc-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        .doc-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 153, 51, 0.3);
+        }
+
+        .doc-img {
+            height: 180px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background: linear-gradient(135deg, #FF9933, #FF5500);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .free-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background: rgba(40, 167, 69, 0.9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .doc-price {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .locked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #6c757d;
+        }
+
+        .filter-btn.active {
+            background: #FF9933;
+            color: white;
+            border-color: #FF9933;
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: #e9ecef;
+        }
+    </style>
+
+    <main class="container my-5">
+
+        <!-- Hero Section -->
+        <div class="marketplace-hero shadow-sm">
+            <h1 class="display-5 fw-bold mb-3" style="font-family: 'Cinzel', serif;">Knowledge Marketplace</h1>
+            <p class="text-muted mb-4 lead">Discover, buy, and sell premium academic resources.</p>
+
+            <div class="search-container">
+                <form action="/marketplace" method="GET" class="d-flex">
+                    <input type="text" name="search"
+                        class="form-control form-control-lg border-0 shadow-sm rounded-pill ps-4"
+                        placeholder="Search for notes, exams, or topics..." value="<%= searchQuery %>">
+                    <button type="submit" class="btn btn-pill-gradient text-white rounded-circle ms-2"
+                        style="width: 50px; height: 50px;">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-center gap-2">
+                <a href="/marketplace"
+                    class="filter-btn <%= !searchQuery ? 'active' : '' %> text-decoration-none">All</a>
+                <a href="/marketplace?filter=premium" class="filter-btn text-decoration-none">Premium</a>
+                <a href="/marketplace?filter=free" class="filter-btn text-decoration-none">Free</a>
+            </div>
+        </div>
+
+        <!-- Feed Grid -->
+        <div class="row g-4 bg-transparent">
+            <% if (documents.length===0) { %>
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted opacity-50"></i>
+                    <p class="mt-3 text-muted">No documents found matching your criteria.</p>
+                </div>
+                <% } %>
+
+                    <% documents.forEach(doc=> { %>
+                        <% const isOwned=doc.userId && user.id===doc.userId._id.toString(); const
+                            isUnlocked=purchasedDocs.includes(doc._id.toString()); const canAccess=!doc.isPremium ||
+                            isOwned || isUnlocked; %>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card doc-card border-0 shadow-sm overflow-hidden">
+                                    <div class="doc-img">
+                                        <% if (doc.isPremium) { %>
+                                            <span class="premium-badge">
+                                                <i class="bi bi-gem me-1"></i>Premium
+                                            </span>
+                                            <% } else { %>
+                                                <span class="free-badge">Free</span>
+                                                <% } %>
+
+                                                    <% if (doc.fileType==='pdf' ) { %>
+                                                        <i
+                                                            class="bi bi-file-earmark-pdf display-1 text-danger opacity-50"></i>
+                                                        <% } else if (doc.fileType==='image' ) { %>
+                                                            <i
+                                                                class="bi bi-file-earmark-image display-1 text-success opacity-50"></i>
+                                                            <% } else { %>
+                                                                <i
+                                                                    class="bi bi-file-earmark-text display-1 text-primary opacity-50"></i>
+                                                                <% } %>
+                                    </div>
+
+                                    <div class="card-body p-3 d-flex flex-column">
+                                        <h6 class="fw-bold text-truncate mb-1" title="<%= doc.originalName %>">
+                                            <%= doc.originalName %>
+                                        </h6>
+                                        <small class="text-muted mb-2">
+                                            by <%= doc.userId ? doc.userId.username : 'Unknown' %>
+                                        </small>
+
+                                        <p class="small text-muted mb-3 flex-grow-1" style="min-height: 40px;">
+                                            <%= doc.description ? doc.description.substring(0, 60) + '...'
+                                                : 'No description provided.' %>
+                                        </p>
+
+                                        <div
+                                            class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                            <div class="doc-price">
+                                                <% if (doc.isPremium) { %>
+                                                    <% if (canAccess) { %>
+                                                        <span class="text-success"><i
+                                                                class="bi bi-check-circle-fill me-1"></i>Unlocked</span>
+                                                        <% } else { %>
+                                                            ₹<%= doc.price || 50 %>
+                                                                <% } %>
+                                                                    <% } else { %>
+                                                                        <span class="text-success">Free</span>
+                                                                        <% } %>
+                                            </div>
+
+                                            <% if (canAccess) { %>
+                                                <a href="/documents/<%= doc._id %>"
+                                                    class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                                    View <i class="bi bi-arrow-right ms-1"></i>
+                                                </a>
+                                                <% } else { %>
+                                                    <button
+                                                        onclick="unlockDocument('<%= doc._id %>', '<%= doc.originalName %>')"
+                                                        class="btn btn-sm btn-pill-gradient text-white rounded-pill px-3">
+                                                        Unlock <i class="bi bi-lock-fill ms-1"></i>
+                                                    </button>
+                                                    <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+        </div>
+    </main>
+
+    <!-- Unlock Modal -->
+    <div class="modal fade" id="unlockModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 1rem;">
+                <div class="modal-body p-5 text-center">
+                    <div class="bg-saffron bg-opacity-10 rounded-circle d-inline-flex p-4 mb-4">
+                        <i class="bi bi-gem fs-1 text-saffron"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2">Unlock Premium Content</h3>
+                    <p class="text-muted mb-4">Get instant access to <span id="unlockDocName"
+                            class="fw-bold text-dark"></span></p>
+
+                    <div class="card bg-light border-0 p-3 mb-4 text-start">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Base Price</span>
+                            <span class="fw-bold">₹50.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">Platform Fee</small>
+                            <small>₹0.00</small>
+                        </div>
+                        <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark">Total</span>
+                            <h4 class="mb-0 fw-bold text-primary">₹50.00</h4>
+                        </div>
+                    </div>
+
+                    <button id="confirmUnlockBtn" class="btn btn-pill-gradient text-white btn-lg w-100 shadow-sm mb-3">
+                        Pay & Unlock Now
+                    </button>
+                    <button class="btn btn-ghost w-100 border-0" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDocId = null;
+        const unlockModal = new bootstrap.Modal(document.getElementById('unlockModal'));
+
+        function unlockDocument(docId, docName) {
+            currentDocId = docId;
+            document.getElementById('unlockDocName').innerText = docName;
+            unlockModal.show();
+        }
+
+        document.getElementById('confirmUnlockBtn').addEventListener('click', async () => {
+            if (!currentDocId) return;
+
+            const btn = document.getElementById('confirmUnlockBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/marketplace/unlock/${currentDocId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    btn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Success!';
+                    btn.classList.add('btn-success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    alert(data.message || 'Payment failed');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

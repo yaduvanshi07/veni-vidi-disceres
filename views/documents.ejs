@@ -1,0 +1,232 @@
+<%- include('partials/header', { title: 'Documents' , user: user }) %>
+
+    <main class="container my-5">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 fw-bold mb-1">
+                    <i class="bi bi-folder me-2 text-primary"></i>My Documents
+                </h1>
+                <p class="text-muted mb-0">Manage and organize your files</p>
+            </div>
+            <button class="btn btn-primary btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <i class="bi bi-cloud-upload me-2"></i>Upload Document
+            </button>
+        </div>
+
+        <!-- Filters Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-funnel me-2 text-primary"></i>Search & Filter
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="GET" action="/documents/all" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label fw-semibold">
+                            <i class="bi bi-search me-2 text-primary"></i>Search
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="search" name="search"
+                            value="<%= currentSearch %>" placeholder="Search documents...">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="category" class="form-label fw-semibold">
+                            <i class="bi bi-tags me-2 text-primary"></i>Category
+                        </label>
+                        <select class="form-select form-select-lg" id="category" name="category">
+                            <option value="All" <%=currentCategory==='All' ? 'selected' : '' %>>All Categories</option>
+                            <option value="Notes" <%=currentCategory==='Notes' ? 'selected' : '' %>>Notes</option>
+                            <option value="Reports" <%=currentCategory==='Reports' ? 'selected' : '' %>>Reports</option>
+                            <option value="Certificates" <%=currentCategory==='Certificates' ? 'selected' : '' %>
+                                >Certificates</option>
+                            <option value="Other" <%=currentCategory==='Other' ? 'selected' : '' %>>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="sortBy" class="form-label fw-semibold">
+                            <i class="bi bi-sort-alpha-down me-2 text-primary"></i>Sort By
+                        </label>
+                        <select class="form-select form-select-lg" id="sortBy" name="sortBy">
+                            <option value="uploadDate" <%=currentSort==='uploadDate' ? 'selected' : '' %>>Upload Date
+                            </option>
+                            <option value="originalName" <%=currentSort==='originalName' ? 'selected' : '' %>>Name
+                            </option>
+                            <option value="fileSize" <%=currentSort==='fileSize' ? 'selected' : '' %>>File Size</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="order" class="form-label fw-semibold">
+                            <i class="bi bi-arrow-down-up me-2 text-primary"></i>Order
+                        </label>
+                        <select class="form-select form-select-lg" id="order" name="order">
+                            <option value="desc" <%=currentOrder==='desc' ? 'selected' : '' %>>Descending</option>
+                            <option value="asc" <%=currentOrder==='asc' ? 'selected' : '' %>>Ascending</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <button type="submit" class="btn btn-primary btn-lg me-2">
+                            <i class="bi bi-funnel-fill me-2"></i>Apply Filters
+                        </button>
+                        <a href="/documents/all" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Documents Grid -->
+        <% if (documents.length===0) { %>
+            <div class="text-center py-5">
+                <div class="mb-4 opacity-50">
+                    <i class="bi bi-folder2-open display-1 text-muted"></i>
+                </div>
+                <h5 class="fw-bold mb-2">No documents found</h5>
+                <p class="text-muted mb-4">Try adjusting your filters or upload a new file.</p>
+                <button class="btn btn-pill-gradient text-white btn-lg shadow-sm px-4" data-bs-toggle="modal"
+                    data-bs-target="#uploadModal">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                </button>
+            </div>
+            <% } else { %>
+                <div class="row g-4">
+                    <% documents.forEach(doc=> { %>
+                        <div class="col-md-6 col-lg-4">
+                            <div
+                                class="card glass-card h-100 border-0 shadow-sm document-card position-relative overflow-hidden">
+
+                                <!-- Top Accent -->
+                                <div class="position-absolute top-0 start-0 w-100"
+                                    style="height: 4px; background: linear-gradient(90deg, #FF9933, #00CED1);"></div>
+
+                                <div class="card-body p-4 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="file-icon bg-light rounded-3 p-3 shadow-sm border">
+                                            <% if (doc.fileType==='pdf' ) { %>
+                                                <i class="bi bi-file-earmark-pdf text-danger fs-3"></i>
+                                                <% } else if (doc.fileType==='image' ) { %>
+                                                    <i class="bi bi-file-earmark-image text-success fs-3"></i>
+                                                    <% } else { %>
+                                                        <i class="bi bi-file-earmark-text text-primary fs-3"></i>
+                                                        <% } %>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm"
+                                                data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                                <li><a class="dropdown-item" href="/documents/<%= doc._id %>">
+                                                        <i class="bi bi-eye me-2 text-primary"></i>View
+                                                    </a></li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li><a class="dropdown-item text-danger" href="#"
+                                                        onclick="deleteDocument('<%= doc._id %>')">
+                                                        <i class="bi bi-trash me-2"></i>Delete
+                                                    </a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <h6 class="card-title fw-bold mb-2 text-truncate text-dark"
+                                        title="<%= doc.originalName %>">
+                                        <%= doc.originalName %>
+                                    </h6>
+
+                                    <div class="mb-3">
+                                        <span class="badge bg-light text-dark border me-1">
+                                            <%= doc.fileType.toUpperCase() %>
+                                        </span>
+                                        <span class="badge bg-info bg-opacity-10 text-info">
+                                            <%= doc.category %>
+                                        </span>
+                                    </div>
+
+                                    <div class="mb-auto pb-3">
+                                        <% if (doc.isParsed) { %>
+                                            <div class="d-flex align-items-center text-success small">
+                                                <i class="bi bi-check-circle-fill me-2"></i>
+                                                <span>Ready for AI Chat</span>
+                                            </div>
+                                            <% } else { %>
+                                                <div class="d-flex align-items-center text-warning small">
+                                                    <span class="spinner-grow spinner-grow-sm me-2"></span>
+                                                    <span>Processing...</span>
+                                                </div>
+                                                <% } %>
+                                    </div>
+
+                                    <div class="document-info mb-3 pt-3 border-top border-light">
+                                        <div class="d-flex justify-content-between text-muted small">
+                                            <span><i class="bi bi-calendar me-1"></i>
+                                                <%= new Date(doc.uploadDate).toLocaleDateString() %>
+                                            </span>
+                                            <span><i class="bi bi-hdd me-1"></i>
+                                                <%= (doc.fileSize / 1024).toFixed(2) %> KB
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <a href="/documents/<%= doc._id %>"
+                                        class="btn btn-outline-primary w-100 rounded-pill fw-semibold">
+                                        Open Document <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                </div>
+                <% } %>
+    </main>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-gradient-primary text-white border-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="document" class="form-label fw-semibold">
+                                <i class="bi bi-file-earmark me-2 text-primary"></i>Select File
+                            </label>
+                            <input type="file" class="form-control form-control-lg" id="document" name="document"
+                                accept=".pdf,.jpg,.jpeg,.png,.docx" required>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>Supported: PDF, JPG, PNG, DOCX (Max 10MB)
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="category" class="form-label fw-semibold">
+                                <i class="bi bi-folder me-2 text-primary"></i>Category
+                            </label>
+                            <select class="form-select form-select-lg" id="category" name="category">
+                                <option value="Other">Other</option>
+                                <option value="Notes">Notes</option>
+                                <option value="Reports">Reports</option>
+                                <option value="Certificates">Certificates</option>
+                            </select>
+                        </div>
+                        <div class="progress mb-3" style="display: none;" id="uploadProgress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/documents.js"></script>
+    <%- include('partials/footer') %>

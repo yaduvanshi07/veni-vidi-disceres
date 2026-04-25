@@ -1,0 +1,94 @@
+<%- include('../partials/header', { title: 'Find Papers' , user: user }) %>
+
+    <main class="container-fluid p-0">
+        <div class="hero-section-portal text-center">
+            <div class="container">
+                <h1 class="display-4 fw-bold text-dark mb-4 mt-5 pt-3">Find Your Exam Papers</h1>
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6">
+                        <div class="input-group input-group-lg shadow-sm">
+                            <span class="input-group-text bg-white border-0"><i
+                                    class="bi bi-search text-saffron"></i></span>
+                            <input type="text" id="instSearch" class="form-control border-0"
+                                placeholder="Search universities or institutes...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mb-5">
+            <h3 class="mb-4 fw-bold text-secondary border-start border-4 border-info ps-3">Select Institute</h3>
+
+            <div class="row g-4" id="instGrid">
+                <% if (institutions && institutions.length> 0) { %>
+                    <% institutions.forEach(inst=> { %>
+                        <div class="col-md-6 col-lg-4 inst-card" data-name="<%= inst.name.toLowerCase() %>">
+                            <a href="/institute/<%= inst._id %>/courses" class="text-decoration-none">
+                                <div class="card glass-card h-100 border-0">
+                                    <div class="card-body text-center p-5">
+                                        <div class="mb-3">
+                                            <% if (inst.logo) { %>
+                                                <img src="<%= inst.logo %>" alt="Logo" class="rounded-circle shadow-sm"
+                                                    style="width: 80px; height: 80px; object-fit: cover;">
+                                                <% } else { %>
+                                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                        style="width: 80px; height: 80px;">
+                                                        <i class="bi bi-building fs-1 text-saffron"></i>
+                                                    </div>
+                                                    <% } %>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1">
+                                            <%= inst.name %>
+                                        </h5>
+                                        <p class="text-muted small">
+                                            <%= inst.type %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <% }); %>
+                            <% } else { %>
+                                <div class="col-12 text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-emoji-frown fs-1"></i>
+                                        <p class="mt-3">No institutes found.</p>
+                                    </div>
+                                </div>
+                                <% } %>
+            </div>
+
+            <div id="noResults" class="text-center py-5 d-none">
+                <i class="bi bi-search fs-1 text-muted"></i>
+                <p class="mt-3 text-muted">No institutes match your search.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('instSearch').addEventListener('keyup', function (e) {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.inst-card');
+            let hasVisible = false;
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(term)) {
+                    card.classList.remove('d-none');
+                    hasVisible = true;
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+
+            const noRes = document.getElementById('noResults');
+            if (!hasVisible) {
+                noRes.classList.remove('d-none');
+            } else {
+                noRes.classList.add('d-none');
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

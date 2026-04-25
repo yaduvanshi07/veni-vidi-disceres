@@ -1,0 +1,78 @@
+:root {
+    --color-saffron: #FF9933;
+    --color-aqua: #00CED1; /* Dark Turquoise for better readability */
+    --color-light-blue: #E0F7FA;
+    --color-grey: #F5F5F5;
+    --color-dark-text: #333333;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.5);
+}
+
+body {
+    background-color: var(--color-grey);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Utilities */
+.text-saffron { color: var(--color-saffron) !important; }
+.bg-saffron { background-color: var(--color-saffron) !important; color: white; }
+.text-aqua { color: var(--color-aqua) !important; }
+.bg-aqua { background-color: var(--color-aqua) !important; color: white; }
+
+.bg-gradient-saffron {
+    background: linear-gradient(135deg, #FF9933 0%, #FFB366 100%);
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.15);
+}
+
+.btn-saffron {
+    background-color: var(--color-saffron);
+    color: white;
+    border: none;
+    transition: all 0.2s;
+}
+.btn-saffron:hover {
+    background-color: #e68a00;
+    color: white;
+    transform: scale(1.02);
+}
+
+.hero-section-portal {
+    background: linear-gradient(135deg, #FFF3E0 0%, #E0F7FA 100%);
+    padding: 60px 0;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    margin-bottom: 40px;
+}
+
+.step-indicator {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: var(--color-aqua);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.breadcrumb-custom {
+    background: white;
+    border-radius: 50px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}

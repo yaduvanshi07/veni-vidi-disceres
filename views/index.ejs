@@ -1,0 +1,162 @@
+<%- include('partials/header', { title: 'Home', user: user }) %>
+
+<main>
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient-primary text-white py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center min-vh-75">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="hero-content">
+                        <span class="badge bg-light text-primary mb-3 px-3 py-2">
+                            <i class="bi bi-stars me-2"></i>AI-Powered Document Assistant
+                        </span>
+                        <h1 class="display-3 fw-bold mb-4">Transform Your Documents Into Actionable Insights</h1>
+                        <p class="lead mb-4">
+                            Upload documents, extract text automatically with OCR, and interact with an intelligent AI chatbot 
+                            that understands your content and answers questions in real-time.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <a href="/signup" class="btn btn-light btn-lg px-4 py-3 shadow-sm">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+                            </a>
+                            <a href="/login" class="btn btn-outline-light btn-lg px-4 py-3">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                            </a>
+                        </div>
+                        <div class="d-flex gap-4 text-white-50">
+                            <div>
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>No Credit Card Required
+                            </div>
+                            <div>
+                                <i class="bi bi-shield-check-fill text-success me-2"></i>Secure & Private
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image position-relative">
+                        <div class="card shadow-lg border-0 overflow-hidden">
+                            <div class="card-body bg-white p-0">
+                                <div class="feature-showcase">
+                                    <div class="feature-item p-4 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <div class="feature-icon bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                                <i class="bi bi-cloud-upload text-primary fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">Smart Upload</h6>
+                                                <p class="text-muted small mb-0">Support for PDF, Images & Word files</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="feature-item p-4 border-bottom">
+                                        <div class="d-flex align-items-center">
+                                            <div class="feature-icon bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                                <i class="bi bi-file-text text-success fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">Auto Text Extraction</h6>
+                                                <p class="text-muted small mb-0">Advanced OCR powered by Tesseract.js</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="feature-item p-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="feature-icon bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                                                <i class="bi bi-robot text-info fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">AI Assistant</h6>
+                                                <p class="text-muted small mb-0">Powered by Google Gemini AI</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">Powerful Features</h2>
+                <p class="lead text-muted">Everything you need to manage and understand your documents</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="feature-icon-large bg-primary bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                                <i class="bi bi-file-earmark-pdf text-primary display-6"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Multiple Formats</h5>
+                            <p class="text-muted mb-0">Upload PDF, JPG, PNG, and DOCX files with ease. Our system handles all major document formats.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="feature-icon-large bg-success bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                                <i class="bi bi-search text-success display-6"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Advanced OCR</h5>
+                            <p class="text-muted mb-0">Extract text from scanned documents and images using cutting-edge OCR technology.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="feature-icon-large bg-info bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                                <i class="bi bi-chat-left-text text-info display-6"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Smart Chatbot</h5>
+                            <p class="text-muted mb-0">Ask questions about your documents and get instant, context-aware answers from AI.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="feature-icon-large bg-warning bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                                <i class="bi bi-folder2-open text-warning display-6"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Organize & Search</h5>
+                            <p class="text-muted mb-0">Categorize documents and search through your entire library quickly and efficiently.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="feature-icon-large bg-danger bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                                <i class="bi bi-shield-lock text-danger display-6"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Secure & Private</h5>
+                            <p class="text-muted mb-0">Your documents are encrypted and stored securely. Privacy is our top priority.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="feature-icon-large bg-secondary bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                                <i class="bi bi-graph-up text-secondary display-6"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Analytics Dashboard</h5>
+                            <p class="text-muted mb-0">Track your document usage, parsing stats, and chat interactions with detailed analytics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

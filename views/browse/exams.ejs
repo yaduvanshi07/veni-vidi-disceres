@@ -1,0 +1,65 @@
+<%- include('../partials/header', { title: 'Select Exam Type' , user: user }) %>
+
+    <main class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb breadcrumb-custom">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-saffron">Home</a></li>
+                <li class="breadcrumb-item"><a href="/institute/<%= institution._id %>/courses"
+                        class="text-decoration-none text-saffron">
+                        <%= institution.name %>
+                    </a></li>
+                <li class="breadcrumb-item"><a href="/institute/<%= institution._id %>/course/<%= course._id %>/years"
+                        class="text-decoration-none text-saffron">
+                        <%= course.name %>
+                    </a></li>
+                <li class="breadcrumb-item active" aria-current="page">Year <%= year %>
+                </li>
+            </ol>
+        </nav>
+
+        <h2 class="fw-bold mb-4 text-dark">Select Exam Type</h2>
+
+        <div class="row g-5 justify-content-center">
+            <!-- Assessment -->
+            <div class="col-md-5">
+                <a href="/papers?instId=<%= institution._id %>&courseId=<%= course._id %>&year=<%= year %>&examType=Assessment"
+                    class="text-decoration-none">
+                    <div
+                        class="card glass-card h-100 border-0 p-5 text-center card-hover-lift position-relative overflow-hidden">
+                        <div
+                            class="position-absolute top-0 start-0 w-100 h-100 opacity-0 bg-gradient-saffron hover-opacity-10 transition-all">
+                        </div>
+                        <div class="card-body position-relative z-1">
+                            <div class="rounded-circle bg-saffron text-white d-inline-flex p-4 mb-4 shadow-sm">
+                                <i class="bi bi-clipboard-check fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold text-dark mb-3">Assessment Questions</h3>
+                            <p class="text-muted lead">Internal assessments, quizzes, and mid-terms.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- End Semester -->
+            <div class="col-md-5">
+                <a href="/papers?instId=<%= institution._id %>&courseId=<%= course._id %>&year=<%= year %>&examType=EndSemester"
+                    class="text-decoration-none">
+                    <div
+                        class="card glass-card h-100 border-0 p-5 text-center card-hover-lift position-relative overflow-hidden">
+                        <div
+                            class="position-absolute top-0 start-0 w-100 h-100 opacity-0 bg-gradient-aqua hover-opacity-10 transition-all">
+                        </div>
+                        <div class="card-body position-relative z-1">
+                            <div class="rounded-circle bg-aqua text-white d-inline-flex p-4 mb-4 shadow-sm">
+                                <i class="bi bi-mortarboard fs-1"></i>
+                            </div>
+                            <h3 class="fw-bold text-dark mb-3">End Semester Questions</h3>
+                            <p class="text-muted lead">Final exams and end-of-semester papers.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>

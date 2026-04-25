@@ -1,0 +1,84 @@
+<%- include('partials/header', { title: 'Analytics', user: user }) %>
+
+<main class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">
+                <i class="bi bi-graph-up me-2 text-primary"></i>Study Analytics
+            </h1>
+            <p class="text-muted mb-0">Track your learning patterns and performance</p>
+        </div>
+        <a href="/dashboard" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Performance Prediction Card -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white border-0">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-speedometer me-2"></i>Performance Prediction
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <div id="performanceData" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Study Patterns -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-calendar-check me-2 text-primary"></i>Study Patterns
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div id="studyPatterns" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weak Topics -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-exclamation-triangle me-2 text-warning"></i>Weak Topics
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div id="weakTopics" class="text-center py-4">
+                        <div class="spinner-border text-warning" role="status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Trends -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-question-circle me-2 text-info"></i>Frequently Asked Questions
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <div id="faqTrends" class="text-center py-4">
+                <div class="spinner-border text-info" role="status"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/js/analytics.js"></script>
+<%- include('partials/footer') %>
+

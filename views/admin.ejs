@@ -1,0 +1,204 @@
+<%- include('partials/header', { title: 'Admin Panel', user: user }) %>
+
+<main class="container my-5">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">
+                <i class="bi bi-shield-check me-2 text-danger"></i>Admin Panel
+            </h1>
+            <p class="text-muted mb-0">System overview and management</p>
+        </div>
+        <a href="/dashboard" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Analytics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 analytics-card analytics-primary">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase small fw-semibold mb-2">Total Users</h6>
+                            <h2 class="mb-0 fw-bold"><%= analytics.totalUsers %></h2>
+                        </div>
+                        <div class="analytics-icon bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-people-fill text-primary fs-4"></i>
+                        </div>
+                    </div>
+                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-person-check me-1"></i>Registered
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 analytics-card analytics-info">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase small fw-semibold mb-2">Total Documents</h6>
+                            <h2 class="mb-0 fw-bold"><%= analytics.totalDocuments %></h2>
+                        </div>
+                        <div class="analytics-icon bg-info bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-folder-fill text-info fs-4"></i>
+                        </div>
+                    </div>
+                    <span class="badge bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-file-earmark me-1"></i>All Files
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 analytics-card analytics-success">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase small fw-semibold mb-2">Parsed Documents</h6>
+                            <h2 class="mb-0 fw-bold"><%= analytics.parsedDocuments %></h2>
+                        </div>
+                        <div class="analytics-icon bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-file-text-fill text-success fs-4"></i>
+                        </div>
+                    </div>
+                    <span class="badge bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-check-circle me-1"></i>Ready
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100 analytics-card analytics-warning">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="text-muted text-uppercase small fw-semibold mb-2">Chat Queries</h6>
+                            <h2 class="mb-0 fw-bold"><%= analytics.totalChatQueries %></h2>
+                        </div>
+                        <div class="analytics-icon bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="bi bi-chat-dots-fill text-warning fs-4"></i>
+                        </div>
+                    </div>
+                    <span class="badge bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-robot me-1"></i>AI Interactions
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Users Card -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-people me-2 text-primary"></i>Recent Users
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">Username</th>
+                            <th class="border-0">Email</th>
+                            <th class="border-0">Role</th>
+                            <th class="border-0">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentUsers.forEach(user => { %>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                            <i class="bi bi-person text-primary"></i>
+                                        </div>
+                                        <span class="fw-semibold"><%= user.username %></span>
+                                    </div>
+                                </td>
+                                <td><%= user.email %></td>
+                                <td>
+                                    <span class="badge bg-<%= user.role === 'admin' ? 'danger' : 'secondary' %>">
+                                        <i class="bi bi-shield-<%= user.role === 'admin' ? 'check' : 'fill' %> me-1"></i><%= user.role %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i><%= new Date(user.createdAt).toLocaleDateString() %>
+                                    </small>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Documents Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-folder me-2 text-primary"></i>Recent Documents
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">Filename</th>
+                            <th class="border-0">User</th>
+                            <th class="border-0">Type</th>
+                            <th class="border-0">Category</th>
+                            <th class="border-0">Status</th>
+                            <th class="border-0">Uploaded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentDocuments.forEach(doc => { %>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded p-2 me-2">
+                                            <i class="bi bi-file-earmark text-primary"></i>
+                                        </div>
+                                        <span class="fw-semibold"><%= doc.originalName %></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        <%= doc.userId ? doc.userId.username : 'Unknown' %>
+                                    </span>
+                                </td>
+                                <td><span class="badge bg-secondary"><%= doc.fileType.toUpperCase() %></span></td>
+                                <td><span class="badge bg-info"><%= doc.category %></span></td>
+                                <td>
+                                    <% if (doc.isParsed) { %>
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Parsed
+                                        </span>
+                                    <% } else { %>
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Not Parsed
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i><%= new Date(doc.uploadDate).toLocaleDateString() %>
+                                    </small>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<%- include('partials/footer') %>

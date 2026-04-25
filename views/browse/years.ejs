@@ -1,0 +1,40 @@
+<%- include('../partials/header', { title: 'Select Year' , user: user }) %>
+
+    <main class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb breadcrumb-custom">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-saffron">Home</a></li>
+                <li class="breadcrumb-item"><a href="/institute/<%= institution._id %>/courses"
+                        class="text-decoration-none text-saffron">
+                        <%= institution.name %>
+                    </a></li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <%= course.name %>
+                </li>
+            </ol>
+        </nav>
+
+        <h2 class="fw-bold mb-4 text-dark">Select Year</h2>
+
+        <div class="row g-4">
+            <% years.forEach(y=> { %>
+                <div class="col-md-6 col-lg-3">
+                    <a href="/institute/<%= institution._id %>/course/<%= course._id %>/year/<%= y.value %>/exams"
+                        class="text-decoration-none">
+                        <div class="card glass-card h-100 text-center border-0 p-4">
+                            <div class="card-body">
+                                <h1 class="display-3 fw-bold text-saffron mb-3">
+                                    <%= y.value %>
+                                </h1>
+                                <h5 class="fw-bold text-dark">
+                                    <%= y.label %>
+                                </h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <% }); %>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>

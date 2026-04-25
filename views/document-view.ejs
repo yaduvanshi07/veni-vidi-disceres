@@ -1,0 +1,214 @@
+<%- include('partials/header', { title: 'Document View' , user: user }) %>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <!-- Document Info Card -->
+                <div class="card glass-card border-0 mb-4">
+                    <div class="card-header bg-transparent border-0 pb-0 pt-4 px-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="file-icon-large bg-light rounded-circle shadow-sm p-3 me-3">
+                                        <% if (document.fileType==='pdf' ) { %>
+                                            <i class="bi bi-file-earmark-pdf text-danger fs-2"></i>
+                                            <% } else if (document.fileType==='image' ) { %>
+                                                <i class="bi bi-file-earmark-image text-success fs-2"></i>
+                                                <% } else { %>
+                                                    <i class="bi bi-file-earmark-word text-info fs-2"></i>
+                                                    <% } %>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-1 fw-bold text-dark">
+                                            <%= document.originalName %>
+                                        </h4>
+                                        <div class="mb-2">
+                                            <span class="badge bg-secondary me-1">
+                                                <%= document.fileType.toUpperCase() %>
+                                            </span>
+                                            <span class="badge bg-aqua me-1 text-dark">
+                                                <%= document.category %>
+                                            </span>
+                                            <% if (document.isParsed) { %>
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Parsed
+                                                </span>
+                                                <% } else { %>
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-exclamation-circle me-1"></i>Not Parsed
+                                                    </span>
+                                                    <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="document-meta mb-3">
+                                    <div class="d-flex flex-wrap gap-3 text-muted small">
+                                        <span><i class="bi bi-calendar me-1"></i>
+                                            <%= new Date(document.uploadDate).toLocaleString() %>
+                                        </span>
+                                        <span><i class="bi bi-hdd me-1"></i>
+                                            <%= (document.fileSize / 1024).toFixed(2) %> KB
+                                        </span>
+                                        <% if (document.examDate) { %>
+                                            <span><i class="bi bi-clock-history me-1"></i>Exam: <%= new
+                                                    Date(document.examDate).toLocaleDateString() %></span>
+                                            <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-ghost" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                    <li class="px-3 py-2">
+                                        <label class="form-label small fw-semibold mb-2">Category</label>
+                                        <select class="form-select form-select-sm" id="categorySelect"
+                                            onchange="updateCategory('<%= document._id %>', this.value)">
+                                            <option value="Notes" <%=document.category==='Notes' ? 'selected' : '' %>
+                                                >Notes</option>
+                                            <option value="Reports" <%=document.category==='Reports' ? 'selected' : ''
+                                                %>>Reports</option>
+                                            <option value="Certificates" <%=document.category==='Certificates'
+                                                ? 'selected' : '' %>>Certificates</option>
+                                            <option value="Other" <%=document.category==='Other' ? 'selected' : '' %>
+                                                >Other</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item text-danger" href="#"
+                                            onclick="deleteDocument('<%= document._id %>')">
+                                            <i class="bi bi-trash me-2"></i>Delete Document
+                                        </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <% if (!document.isParsed) { %>
+                                <button class="btn btn-pill-gradient text-white btn-lg"
+                                    onclick="parseDocument('<%= document._id %>')">
+                                    <i class="bi bi-file-text me-2"></i>Parse Document
+                                </button>
+                                <% } else { %>
+                                    <button class="btn btn-outline-primary btn-lg rounded-pill"
+                                        onclick="parseDocument('<%= document._id %>')">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>Re-parse
+                                    </button>
+                                    <a href="/api/download-text/<%= document._id %>"
+                                        class="btn btn-outline-success btn-lg rounded-pill">
+                                        <i class="bi bi-download me-2"></i>Download Text
+                                    </a>
+                                    <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parsed Text Preview Card -->
+                <div class="card glass-card border-0">
+                    <div class="card-header bg-transparent border-0 pb-0 pt-4 px-4">
+                        <h5 class="mb-0 fw-bold text-dark">
+                            <i class="bi bi-file-text me-2 text-saffron"></i>Extracted Text
+                            <span class="spinner-border spinner-border-sm ms-2" id="parseSpinner"
+                                style="display: none;"></span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="extractedText" class="bg-white p-4 rounded border-0 shadow-sm"
+                            style="min-height: 300px; max-height: 600px; overflow-y: auto;">
+                            <% if (document.isParsed && document.extractedText) { %>
+                                <pre class="mb-0 text-dark"
+                                    style="white-space: pre-wrap; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.7;"><%= document.extractedText %></pre>
+                                <% } else { %>
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-file-text display-1 text-muted mb-3 opacity-50"></i>
+                                        <p class="text-muted mb-0">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            Click "Parse Document" to extract text from this file.
+                                        </p>
+                                    </div>
+                                    <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbot Section -->
+            <div class="col-lg-4">
+                <div class="card glass-card border-0 h-70 d-flex flex-column">
+                    <div class="card-header bg-gradient-saffron text-white border-bottom-0 rounded-top p-4">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi bi-robot me-2"></i>AI Assistant
+                        </h5>
+                        <small class="text-white-50">Powered by Gemini AI</small>
+                    </div>
+                    <div class="card-body flex-grow-1 overflow-auto bg-white bg-opacity-50" style="max-height: 400px;"
+                        id="chatContainer">
+                        <% if (document.chatHistory && document.chatHistory.length> 0) { %>
+                            <% document.chatHistory.forEach(msg=> { %>
+                                <div class="mb-3 <%= msg.role === 'user' ? 'text-end' : '' %>">
+                                    <div class="d-inline-block p-3 rounded-3 shadow-sm <%= msg.role === 'user' ? 'bg-saffron text-white' : 'bg-white border' %>"
+                                        style="max-width: 85%;">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i
+                                                class="bi bi-<%= msg.role === 'user' ? 'person-fill' : 'robot' %> me-2"></i>
+                                            <small class="fw-bold opacity-75">
+                                                <%= msg.role==='user' ? 'You' : 'Assistant' %>
+                                            </small>
+                                            <small class="ms-auto opacity-50">
+                                                <%= new Date(msg.timestamp).toLocaleTimeString() %>
+                                            </small>
+                                        </div>
+                                        <div style="white-space: pre-wrap;">
+                                            <%= msg.content %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }); %>
+                                    <% } else { %>
+                                        <div class="text-center text-muted py-5">
+                                            <div class="mb-3">
+                                                <div class="bg-light rounded-circle d-inline-flex p-3">
+                                                    <i class="bi bi-chat-dots fs-1 text-saffron"></i>
+                                                </div>
+                                            </div>
+                                            <h6 class="fw-bold text-dark mb-2">Start a Conversation</h6>
+                                            <p class="small mb-0">Ask me anything about this document!</p>
+                                        </div>
+                                        <% } %>
+                                            <div id="chatSpinner" class="text-center py-3" style="display: none;">
+                                                <div class="spinner-border spinner-border-sm text-saffron"></div>
+                                                <p class="text-muted small mt-2 mb-0">AI is thinking...</p>
+                                            </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top p-3">
+                        <% if (!document.isParsed) { %>
+                            <div class="alert alert-warning mb-0 d-flex align-items-center border-0 shadow-sm">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <small>Please parse the document first to use the chatbot.</small>
+                            </div>
+                            <% } else { %>
+                                <form id="chatForm" onsubmit="sendChatMessage(event, '<%= document._id %>')">
+                                    <div class="input-group input-group-lg shadow-sm">
+                                        <input type="text" class="form-control border-0" id="chatInput"
+                                            placeholder="Ask a question..." required>
+                                        <button type="submit" class="btn btn-saffron px-4">
+                                            <i class="bi bi-send-fill"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const documentId = '<%= document._id %>';
+    </script>
+    <script src="/js/document-view.js"></script>
+    <%- include('partials/footer') %>
