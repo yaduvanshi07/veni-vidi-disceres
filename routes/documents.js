@@ -7,6 +7,7 @@ const { requireAuth } = require('../middleware/auth');
 const Document = require('../models/Document');
 const User = require('../models/User');
 const { extractTextFromDocument } = require('../utils/textExtraction');
+const { DEMO_TOKEN_LIMIT, isPublicDemoDoc } = require('../utils/demoConfig');
 
 // ── Uploads directory setup ───────────────────────────────────────────────────
 const uploadsDir = path.join(__dirname, '..', 'uploads');
@@ -44,11 +45,8 @@ const upload = multer({
   fileFilter
 });
 
-// ── Auth on all routes ────────────────────────────────────────────────────────
-router.use(requireAuth);
-
 // ── Upload document ───────────────────────────────────────────────────────────
-router.post('/upload', upload.single('document'), async (req, res) => {
+router.post('/upload', requireAuth, upload.single('document'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
@@ -98,7 +96,7 @@ router.post('/upload', upload.single('document'), async (req, res) => {
 });
 
 // ── Get all documents (API) ───────────────────────────────────────────────────
-router.get('/api/all', async (req, res) => {
+router.get('/api/all', requireAuth, async (req, res) => {
   try {
     const documents = await Document.find({ userId: req.session.userId, isParsed: true })
       .select('_id originalName uploadDate')
@@ -112,7 +110,7 @@ router.get('/api/all', async (req, res) => {
 });
 
 // ── Get all documents (view) ──────────────────────────────────────────────────
-router.get('/all', async (req, res) => {
+router.get('/all', requireAuth, async (req, res) => {
   try {
     const { category, search, sortBy = 'uploadDate', order = 'desc' } = req.query;
 
@@ -155,17 +153,29 @@ router.get('/:id', async (req, res) => {
   try {
     const document = await Document.findById(req.params.id);
     if (!document) {
-      return res.status(404).render('error', { error: 'Document not found', user: req.session.user || null });
+      return res.status(404).render('error', { error: 'Document not found', user: req.session?.user || null });
     }
 
-    // Access control
-    const user = await User.findById(req.session.userId);
-    const isOwner = document.userId.toString() === req.session.userId;
-    const isUnlocked = user.purchasedDocuments.some((id) => id.toString() === document._id.toString());
-    const isFree = !document.isPremium;
+    const isPublicDemo = isPublicDemoDoc(document);
+    const isAuthenticated = Boolean(req.session && req.session.userId);
 
-    if (!isOwner && !isUnlocked && !isFree) {
-      return res.redirect(`/marketplace?unlock=${document._id}`);
+    // Access control:
+    // If unauthenticated, allow ONLY the designated public demo document
+    if (!isAuthenticated) {
+      if (!isPublicDemo) {
+        req.session.returnTo = req.originalUrl;
+        return res.redirect('/login');
+      }
+    } else {
+      // Authenticated access control
+      const user = await User.findById(req.session.userId);
+      const isOwner = document.userId.toString() === req.session.userId;
+      const isUnlocked = user?.purchasedDocuments?.some((id) => id.toString() === document._id.toString());
+      const isFree = !document.isPremium;
+
+      if (!isPublicDemo && !isOwner && !isUnlocked && !isFree) {
+        return res.redirect(`/marketplace?unlock=${document._id}`);
+      }
     }
 
     // Track view (fire-and-forget, no await to keep response fast)
@@ -174,19 +184,34 @@ router.get('/:id', async (req, res) => {
       lastViewed: new Date()
     }).catch((e) => console.error('[DOCUMENTS] View track error:', e));
 
+    let demoTokenUsage = 0;
+    let isGuestDemo = false;
+    let chatHistoryToRender = document.chatHistory || [];
+
+    if (!isAuthenticated && isPublicDemo) {
+      isGuestDemo = true;
+      req.session.demoTokenUsage = req.session.demoTokenUsage || 0;
+      demoTokenUsage = req.session.demoTokenUsage;
+      chatHistoryToRender = req.session.demoChatHistory || [];
+    }
+
     res.render('document-view', {
-      user: req.session.user,
+      user: req.session.user || null,
       document,
+      isGuestDemo,
+      demoTokenUsage,
+      demoTokenLimit: DEMO_TOKEN_LIMIT,
+      chatHistory: chatHistoryToRender,
       sessionStart: new Date().toISOString()
     });
   } catch (error) {
     console.error('[DOCUMENTS] View error:', error);
-    res.render('error', { error: 'Failed to load document', user: req.session.user || null });
+    res.render('error', { error: 'Failed to load document', user: req.session?.user || null });
   }
 });
 
 // ── Parse document ────────────────────────────────────────────────────────────
-router.post('/:id/parse', async (req, res) => {
+router.post('/:id/parse', requireAuth, async (req, res) => {
   try {
     const document = await Document.findOne({ _id: req.params.id, userId: req.session.userId });
     if (!document) {
@@ -215,7 +240,7 @@ router.post('/:id/parse', async (req, res) => {
 });
 
 // ── Delete document ───────────────────────────────────────────────────────────
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const document = await Document.findOneAndDelete({
       _id: req.params.id,
@@ -241,7 +266,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ── Update document category ──────────────────────────────────────────────────
-router.patch('/:id/category', async (req, res) => {
+router.patch('/:id/category', requireAuth, async (req, res) => {
   try {
     const { category } = req.body;
     const ALLOWED_CATEGORIES = ['Notes', 'Reports', 'Certificates', 'Other'];

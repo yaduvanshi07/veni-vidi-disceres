@@ -20,7 +20,10 @@ router.get('/signup', redirectIfAuth, (req, res) => {
 
 router.post('/signup', redirectIfAuth, async (req, res) => {
   try {
-    const { username, email, password, confirmPassword } = req.body;
+    const username = String(req.body.username || '').trim();
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+    const confirmPassword = String(req.body.confirmPassword || '');
 
     // Validate inputs
     if (!username || !email || !password || !confirmPassword) {
@@ -38,12 +41,15 @@ router.post('/signup', redirectIfAuth, async (req, res) => {
     if (password.length < 6) {
       return res.render('signup', { error: 'Password must be at least 6 characters', user: null });
     }
+    if (password.length > 72) {
+      return res.render('signup', { error: 'Password cannot exceed 72 characters', user: null });
+    }
     if (password !== confirmPassword) {
       return res.render('signup', { error: 'Passwords do not match', user: null });
     }
 
     // Check duplicates
-    const existing = await User.findOne({ $or: [{ email: email.toLowerCase() }, { username }] });
+    const existing = await User.findOne({ $or: [{ email }, { username }] });
     if (existing) {
       return res.render('signup', { error: 'Username or email already exists', user: null });
     }
@@ -52,19 +58,27 @@ router.post('/signup', redirectIfAuth, async (req, res) => {
     const user = new User({ username, email, password });
     await user.save();
 
-    // Set session
-    req.session.userId = user._id.toString();
-    req.session.username = user.username;
-    req.session.role = user.role;
-    req.session.user = {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      preferences: user.preferences
-    };
+    // Regenerate session to prevent session fixation
+    req.session.regenerate((err) => {
+      if (err) {
+        console.error('[AUTH] Session regeneration error:', err);
+        return res.render('signup', { error: 'An error occurred. Please try again.', user: null });
+      }
 
-    res.redirect('/marketplace');
+      // Set session variables
+      req.session.userId = user._id.toString();
+      req.session.username = user.username;
+      req.session.role = user.role;
+      req.session.user = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        preferences: user.preferences
+      };
+
+      res.redirect('/marketplace');
+    });
   } catch (error) {
     console.error('[AUTH] Signup error:', error);
     res.render('signup', { error: 'An error occurred. Please try again.', user: null });
@@ -78,14 +92,15 @@ router.get('/login', redirectIfAuth, (req, res) => {
 
 router.post('/login', redirectIfAuth, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
 
     if (!email || !password) {
       return res.render('login', { error: 'Email and password are required', user: null });
     }
 
     // Load user WITH password field (select: false on model)
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const user = await User.findOne({ email }).select('+password');
     if (!user || !user.isActive) {
       return res.render('login', { error: 'Invalid email or password', user: null });
     }
@@ -98,21 +113,30 @@ router.post('/login', redirectIfAuth, async (req, res) => {
     // Update lastLoginAt without saving the whole document
     await User.updateOne({ _id: user._id }, { lastLoginAt: new Date() });
 
-    // Set session
-    req.session.userId = user._id.toString();
-    req.session.username = user.username;
-    req.session.role = user.role;
-    req.session.user = {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      preferences: user.preferences
-    };
-
+    // Store returnTo from session before regeneration
     const returnTo = req.session.returnTo || '/marketplace';
-    delete req.session.returnTo;
-    res.redirect(returnTo);
+
+    // Regenerate session to prevent session fixation
+    req.session.regenerate((err) => {
+      if (err) {
+        console.error('[AUTH] Session regeneration error:', err);
+        return res.render('login', { error: 'An error occurred. Please try again.', user: null });
+      }
+
+      // Set session variables
+      req.session.userId = user._id.toString();
+      req.session.username = user.username;
+      req.session.role = user.role;
+      req.session.user = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        preferences: user.preferences
+      };
+
+      res.redirect(returnTo);
+    });
   } catch (error) {
     console.error('[AUTH] Login error:', error);
     res.render('login', { error: 'An error occurred. Please try again.', user: null });

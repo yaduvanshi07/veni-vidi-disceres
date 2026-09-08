@@ -1,16 +1,10 @@
 <%- include('../partials/header', { title: 'Select Course' , user: user }) %>
 
     <main class="container py-5">
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb breadcrumb-custom">
-                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-saffron">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    <%= institution.name %>
-                </li>
-            </ol>
-        </nav>
-
-        <h2 class="fw-bold mb-4 text-dark">Select Course</h2>
+        <div class="mb-4">
+            <h2 class="fw-bold mb-1 text-dark">Select Course</h2>
+            <p class="text-muted mb-0"><%= institution.name %></p>
+        </div>
 
         <div class="row g-4">
             <% if (courses && courses.length> 0) { %>

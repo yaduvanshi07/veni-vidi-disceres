@@ -2,26 +2,10 @@
 
     <main class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb breadcrumb-custom mb-0">
-                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-saffron">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/institute/<%= institution._id %>/courses"
-                            class="text-decoration-none text-saffron">
-                            <%= institution.name %>
-                        </a></li>
-                    <li class="breadcrumb-item"><a
-                            href="/institute/<%= institution._id %>/course/<%= course._id %>/years"
-                            class="text-decoration-none text-saffron">
-                            <%= course.name %>
-                        </a></li>
-                    <li class="breadcrumb-item"><a
-                            href="/institute/<%= institution._id %>/course/<%= course._id %>/year/<%= year %>/exams"
-                            class="text-decoration-none text-saffron">Year <%= year %></a></li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        <%= examType %>
-                    </li>
-                </ol>
-            </nav>
+            <div>
+                <h3 class="fw-bold mb-0 text-dark"><%= course.name %></h3>
+                <small class="text-muted"><%= institution.name %> &bull; Year <%= year %> &bull; <%= examType %></small>
+            </div>
 
             <button class="btn btn-pill-gradient text-white btn-lg shadow-sm rounded-pill px-4" data-bs-toggle="modal"
                 data-bs-target="#uploadModal">
@@ -142,7 +126,7 @@
                                         This section becomes richer when students contribute.<br>
                                         Be the first to share your notes or exam papers.
                                     </p>
-                                    <button class="btn btn-saffron btn-lg rounded-pill shadow-sm px-5"
+                                    <button class="btn btn-pill-gradient text-white btn-lg rounded-pill shadow-sm px-5"
                                         data-bs-toggle="modal" data-bs-target="#uploadModal">
                                         <i class="bi bi-cloud-plus me-2"></i>Upload First Paper
                                     </button>

@@ -132,6 +132,10 @@ const documentSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    isPublicDemo: {
+      type: Boolean,
+      default: false
+    },
     description: {
       type: String,
       trim: true,
@@ -150,6 +154,7 @@ documentSchema.index({ userId: 1, uploadDate: -1 });
 documentSchema.index({ institutionId: 1, courseId: 1, year: 1, examType: 1 });
 documentSchema.index({ isParsed: 1 });
 documentSchema.index({ isPremium: 1 });
+documentSchema.index({ isPublicDemo: 1 });
 documentSchema.index(
   { originalName: 'text', extractedText: 'text', description: 'text', tags: 'text' },
   { weights: { originalName: 10, description: 5, tags: 3, extractedText: 1 }, name: 'document_text_search' }

@@ -3,15 +3,13 @@
 <main class="container my-5">
     <div class="row justify-content-center align-items-center min-vh-75">
         <div class="col-md-8 col-lg-6 col-xl-5">
-            <div class="card border-0 shadow-lg overflow-hidden">
-                <div class="card-header bg-gradient-success text-white text-center py-4">
-                    <div class="mb-3">
-                        <div class="bg-white bg-opacity-20 rounded-circle d-inline-flex p-3">
-                            <i class="bi bi-person-plus display-6"></i>
-                        </div>
+            <div class="card auth-card">
+                <div class="card-header auth-header-premium">
+                    <div class="auth-icon-container">
+                        <i class="bi bi-person-plus display-6 text-white"></i>
                     </div>
-                    <h2 class="mb-0 fw-bold">Create Account</h2>
-                    <p class="mb-0 opacity-75">Join us today and get started</p>
+                    <h2 class="mb-0 fw-bold text-white">Create Account</h2>
+                    <p class="mb-0 text-white-50 small">Join us today and get started</p>
                 </div>
                 <div class="card-body p-5">
                     <% if (error) { %>
@@ -23,43 +21,53 @@
                     <% } %>
                     <form action="/signup" method="POST">
                         <div class="mb-3">
-                            <label for="username" class="form-label fw-semibold">
-                                <i class="bi bi-person me-2 text-success"></i>Username
-                            </label>
-                            <input type="text" class="form-control form-control-lg" id="username" name="username" placeholder="Choose a username" required minlength="3">
-                            <div class="form-text">
-                                <i class="bi bi-info-circle me-1"></i>Minimum 3 characters
+                            <label for="username" class="form-label fw-semibold">Username</label>
+                            <div class="auth-input-group">
+                                <i class="bi bi-person auth-input-icon"></i>
+                                <input type="text" class="form-control form-control-lg" id="username" name="username" placeholder="Choose a username" required minlength="3" autocomplete="username">
+                            </div>
+                            <div class="form-text small text-muted mt-1">
+                                <i class="bi bi-info-circle me-1"></i>Minimum 3 characters (letters, numbers, underscores)
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label fw-semibold">
-                                <i class="bi bi-envelope me-2 text-success"></i>Email Address
-                            </label>
-                            <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="Enter your email" required>
+                            <label for="email" class="form-label fw-semibold">Email Address</label>
+                            <div class="auth-input-group">
+                                <i class="bi bi-envelope auth-input-icon"></i>
+                                <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label fw-semibold">
-                                <i class="bi bi-lock me-2 text-success"></i>Password
-                            </label>
-                            <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Create a password" required minlength="6">
-                            <div class="form-text">
+                            <label for="password" class="form-label fw-semibold">Password</label>
+                            <div class="auth-input-group auth-input-group-password">
+                                <i class="bi bi-lock auth-input-icon"></i>
+                                <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Create a password" required minlength="6" autocomplete="new-password">
+                                <button class="auth-eye-btn" type="button" id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-text small text-muted mt-1">
                                 <i class="bi bi-shield-check me-1"></i>Minimum 6 characters
                             </div>
                         </div>
                         <div class="mb-4">
-                            <label for="confirmPassword" class="form-label fw-semibold">
-                                <i class="bi bi-lock-fill me-2 text-success"></i>Confirm Password
-                            </label>
-                            <input type="password" class="form-control form-control-lg" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                            <label for="confirmPassword" class="form-label fw-semibold">Confirm Password</label>
+                            <div class="auth-input-group auth-input-group-password">
+                                <i class="bi bi-lock-fill auth-input-icon"></i>
+                                <input type="password" class="form-control form-control-lg" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required autocomplete="new-password">
+                                <button class="auth-eye-btn" type="button" id="toggleConfirmPassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-success btn-lg w-100 mb-4 shadow-sm">
+                        <button type="submit" class="btn btn-auth-submit btn-lg w-100 mb-4 shadow-sm">
                             <i class="bi bi-person-plus me-2"></i>Create Account
                         </button>
                     </form>
                     <div class="text-center">
                         <p class="mb-0 text-muted">
                             Already have an account? 
-                            <a href="/login" class="text-success fw-semibold text-decoration-none">Sign in</a>
+                            <a href="/login" class="text-primary fw-semibold text-decoration-none">Sign in</a>
                         </p>
                     </div>
                 </div>
@@ -72,5 +80,25 @@
         </div>
     </div>
 </main>
+
+<script>
+    const setupToggle = (btnId, inputId) => {
+        document.getElementById(btnId).addEventListener('click', function () {
+            const input = document.getElementById(inputId);
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+    };
+    setupToggle('togglePassword', 'password');
+    setupToggle('toggleConfirmPassword', 'confirmPassword');
+</script>
 
 <%- include('partials/footer') %>

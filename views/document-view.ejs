@@ -56,6 +56,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <% if (typeof user !== 'undefined' && user) { %>
                             <div class="dropdown">
                                 <button class="btn btn-ghost" data-bs-toggle="dropdown">
                                     <i class="bi bi-three-dots-vertical"></i>
@@ -84,25 +85,30 @@
                                         </a></li>
                                 </ul>
                             </div>
+                            <% } %>
                         </div>
                     </div>
                     <div class="card-body p-4">
                         <div class="d-flex gap-2 flex-wrap">
                             <% if (!document.isParsed) { %>
+                                <% if (typeof user !== 'undefined' && user) { %>
                                 <button class="btn btn-pill-gradient text-white btn-lg"
                                     onclick="parseDocument('<%= document._id %>')">
                                     <i class="bi bi-file-text me-2"></i>Parse Document
                                 </button>
-                                <% } else { %>
-                                    <button class="btn btn-outline-primary btn-lg rounded-pill"
-                                        onclick="parseDocument('<%= document._id %>')">
-                                        <i class="bi bi-arrow-clockwise me-2"></i>Re-parse
-                                    </button>
-                                    <a href="/api/download-text/<%= document._id %>"
-                                        class="btn btn-outline-success btn-lg rounded-pill">
-                                        <i class="bi bi-download me-2"></i>Download Text
-                                    </a>
-                                    <% } %>
+                                <% } %>
+                            <% } else { %>
+                                <% if (typeof user !== 'undefined' && user) { %>
+                                <button class="btn btn-outline-primary btn-lg rounded-pill"
+                                    onclick="parseDocument('<%= document._id %>')">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Re-parse
+                                </button>
+                                <% } %>
+                                <a href="/api/download-text/<%= document._id %>"
+                                    class="btn btn-outline-success btn-lg rounded-pill">
+                                    <i class="bi bi-download me-2"></i>Download Text
+                                </a>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -140,15 +146,27 @@
             <div class="col-lg-4">
                 <div class="card glass-card border-0 h-70 d-flex flex-column">
                     <div class="card-header bg-gradient-saffron text-white border-bottom-0 rounded-top p-4">
-                        <h5 class="mb-0 fw-bold">
-                            <i class="bi bi-robot me-2"></i>AI Assistant
-                        </h5>
-                        <small class="text-white-50">Powered by Gemini AI</small>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="bi bi-robot me-2"></i>AI Assistant
+                                </h5>
+                                <small class="text-white-50">Powered by Gemini AI</small>
+                            </div>
+                            <% if (typeof isGuestDemo !== 'undefined' && isGuestDemo) { %>
+                                <div class="text-end">
+                                    <span id="demoTokenBadge" class="badge bg-white text-dark shadow-sm px-2 py-1" style="font-size: 0.78rem; font-weight: 600;">
+                                        <i class="bi bi-cpu me-1 text-saffron"></i>Demo: <span id="demoTokensUsed"><%= demoTokenUsage %></span> / <%= demoTokenLimit %> tokens
+                                    </span>
+                                </div>
+                            <% } %>
+                        </div>
                     </div>
                     <div class="card-body flex-grow-1 overflow-auto bg-white bg-opacity-50" style="max-height: 400px;"
                         id="chatContainer">
-                        <% if (document.chatHistory && document.chatHistory.length> 0) { %>
-                            <% document.chatHistory.forEach(msg=> { %>
+                        <% const activeChatHistory = (typeof chatHistory !== 'undefined' && chatHistory) ? chatHistory : (document.chatHistory || []); %>
+                        <% if (activeChatHistory && activeChatHistory.length > 0) { %>
+                            <% activeChatHistory.forEach(msg => { %>
                                 <div class="mb-3 <%= msg.role === 'user' ? 'text-end' : '' %>">
                                     <div class="d-inline-block p-3 rounded-3 shadow-sm <%= msg.role === 'user' ? 'bg-saffron text-white' : 'bg-white border' %>"
                                         style="max-width: 85%;">
@@ -169,7 +187,7 @@
                                 </div>
                                 <% }); %>
                                     <% } else { %>
-                                        <div class="text-center text-muted py-5">
+                                        <div class="text-center text-muted py-5" id="chatEmptyState">
                                             <div class="mb-3">
                                                 <div class="bg-light rounded-circle d-inline-flex p-3">
                                                     <i class="bi bi-chat-dots fs-1 text-saffron"></i>
@@ -191,11 +209,13 @@
                                 <small>Please parse the document first to use the chatbot.</small>
                             </div>
                             <% } else { %>
+                                <% const limitReachedInitial = Boolean(typeof isGuestDemo !== 'undefined' && isGuestDemo && demoTokenUsage >= demoTokenLimit); %>
                                 <form id="chatForm" onsubmit="sendChatMessage(event, '<%= document._id %>')">
                                     <div class="input-group input-group-lg shadow-sm">
                                         <input type="text" class="form-control border-0" id="chatInput"
-                                            placeholder="Ask a question..." required>
-                                        <button type="submit" class="btn btn-saffron px-4">
+                                            placeholder="<%= limitReachedInitial ? 'Free demo limit reached (1024/1024 tokens)' : 'Ask a question...' %>"
+                                            <%= limitReachedInitial ? 'disabled' : '' %> required>
+                                        <button type="submit" class="btn btn-saffron px-4" id="chatSubmitBtn" <%= limitReachedInitial ? 'disabled' : '' %>>
                                             <i class="bi bi-send-fill"></i>
                                         </button>
                                     </div>
@@ -207,8 +227,33 @@
         </div>
     </main>
 
+    <!-- Demo Limit Modal (Consistent with portal design) -->
+    <div id="demoLimitPopup" class="login-popup-overlay" style="display: none;">
+        <div class="login-popup-card">
+            <button type="button" id="closeDemoPopupBtn" class="login-popup-close-btn" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="login-popup-header">
+                <div class="login-popup-icon-container">
+                    <i class="bi bi-robot login-popup-icon"></i>
+                </div>
+                <h4 class="login-popup-title">You've reached the free demo limit</h4>
+            </div>
+            <div class="login-popup-body">
+                <p>Create an account or log in to continue using the AI Assistant.</p>
+                <div class="login-popup-actions">
+                    <a href="/login" class="btn btn-login-popup-primary">Sign In</a>
+                    <a href="/signup" class="btn btn-login-popup-secondary">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const documentId = '<%= document._id %>';
+        const isGuestDemo = <%= Boolean(typeof isGuestDemo !== 'undefined' && isGuestDemo) %>;
+        let demoTokenUsage = <%= Number(typeof demoTokenUsage !== 'undefined' ? demoTokenUsage : 0) %>;
+        const demoTokenLimit = <%= Number(typeof demoTokenLimit !== 'undefined' ? demoTokenLimit : 1024) %>;
     </script>
     <script src="/js/document-view.js"></script>
     <%- include('partials/footer') %>

@@ -29,8 +29,9 @@
                                     <div class="card-body text-center p-5">
                                         <div class="mb-3">
                                             <% if (inst.logo) { %>
-                                                <img src="<%= inst.logo %>" alt="Logo" class="rounded-circle shadow-sm"
-                                                    style="width: 80px; height: 80px; object-fit: cover;">
+                                                <img src="<%= inst.logo %>" alt="Logo" class="rounded-circle shadow-sm bg-white p-1"
+                                                    style="width: 80px; height: 80px; object-fit: contain;"
+                                                    onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-light rounded-circle d-inline-flex align-items-center justify-content-center\' style=\'width: 80px; height: 80px;\'><i class=\'bi bi-building fs-1 text-saffron\'></i></div>';">
                                                 <% } else { %>
                                                     <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
                                                         style="width: 80px; height: 80px;">
@@ -66,6 +67,29 @@
         </div>
     </main>
 
+    <% if (!user) { %>
+    <div id="loginPopup" class="login-popup-overlay" style="display: none;">
+        <div class="login-popup-card">
+            <button id="closePopupBtn" class="login-popup-close-btn" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="login-popup-header">
+                <div class="login-popup-icon-container">
+                    <i class="bi bi-mortarboard-fill login-popup-icon"></i>
+                </div>
+                <h4 class="login-popup-title">Unlock Full Access</h4>
+            </div>
+            <div class="login-popup-body">
+                <p>Log in or sign up now to browse exam papers, download study material, use the AI chatbot, and track your performance.</p>
+                <div class="login-popup-actions">
+                    <a href="/login" class="btn btn-login-popup-primary">Sign In</a>
+                    <a href="/signup" class="btn btn-login-popup-secondary">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
     <script>
         document.getElementById('instSearch').addEventListener('keyup', function (e) {
             const term = e.target.value.toLowerCase();
@@ -89,6 +113,34 @@
                 noRes.classList.add('d-none');
             }
         });
+
+        // Login popup dismissal logic
+        document.addEventListener('DOMContentLoaded', function () {
+            const popup = document.getElementById('loginPopup');
+            const closeBtn = document.getElementById('closePopupBtn');
+            
+            if (popup && closeBtn) {
+                // Check if already dismissed in this session
+                if (sessionStorage.getItem('loginPopupDismissed') !== 'true') {
+                    popup.style.display = 'flex';
+                }
+
+                const dismissPopup = () => {
+                    popup.style.opacity = '0';
+                    sessionStorage.setItem('loginPopupDismissed', 'true');
+                    setTimeout(() => {
+                        popup.remove();
+                    }, 300);
+                };
+
+                closeBtn.addEventListener('click', dismissPopup);
+                popup.addEventListener('click', function (e) {
+                    if (e.target === popup) {
+                        dismissPopup();
+                    }
+                });
+            }
+        });
     </script>
 
-    <%- include('../partials/footer') %>
+    <%- include('../partials/footer') %>

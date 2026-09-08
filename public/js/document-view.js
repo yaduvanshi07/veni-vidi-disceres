@@ -52,10 +52,46 @@ async function parseDocument(documentId) {
     }
 }
 
+// Modal handling for demo limit
+function showDemoLimitPopup() {
+    const popup = document.getElementById('demoLimitPopup');
+    if (popup) {
+        popup.style.display = 'flex';
+    }
+}
+
+function hideDemoLimitPopup() {
+    const popup = document.getElementById('demoLimitPopup');
+    if (popup) {
+        popup.style.display = 'none';
+    }
+}
+
+function lockChatForDemoLimit() {
+    const chatInput = document.getElementById('chatInput');
+    const chatSubmitBtn = document.getElementById('chatSubmitBtn');
+    if (chatInput) {
+        chatInput.disabled = true;
+        chatInput.placeholder = `Free demo limit reached (${typeof demoTokenLimit !== 'undefined' ? demoTokenLimit : 1024}/${typeof demoTokenLimit !== 'undefined' ? demoTokenLimit : 1024} tokens)`;
+    }
+    if (chatSubmitBtn) {
+        chatSubmitBtn.disabled = true;
+    }
+}
+
 // Send chat message
 async function sendChatMessage(event, documentId) {
     event.preventDefault();
     
+    // Check if guest has reached demo limit before sending
+    if (typeof isGuestDemo !== 'undefined' && isGuestDemo && typeof demoTokenLimit !== 'undefined') {
+        if (demoTokenUsage >= demoTokenLimit) {
+            lockChatForDemoLimit();
+            showDemoLimitPopup();
+            return;
+        }
+    }
+
     const chatInput = document.getElementById('chatInput');
     const message = chatInput.value.trim();
     
@@ -65,14 +101,22 @@ async function sendChatMessage(event, documentId) {
 
     const chatContainer = document.getElementById('chatContainer');
     const chatSpinner = document.getElementById('chatSpinner');
+    const emptyState = document.getElementById('chatEmptyState');
+    if (emptyState) {
+        emptyState.remove();
+    }
     
-    // Add user message to chat
+    // Add user message to chat with saffron styling consistent with theme
     const userMessageDiv = document.createElement('div');
     userMessageDiv.className = 'mb-3 text-end';
     userMessageDiv.innerHTML = `
-        <div class="d-inline-block p-2 rounded bg-primary text-white" style="max-width: 85%;">
-            <small class="d-block mb-1 fw-bold">You</small>
-            <div>${message}</div>
+        <div class="d-inline-block p-3 rounded-3 shadow-sm bg-saffron text-white" style="max-width: 85%;">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-person-fill me-2"></i>
+                <small class="fw-bold opacity-75">You</small>
+                <small class="ms-auto opacity-50">${new Date().toLocaleTimeString()}</small>
+            </div>
+            <div style="white-space: pre-wrap;">${escapeHtml(message)}</div>
         </div>
     `;
     chatContainer.appendChild(userMessageDiv);
@@ -94,20 +138,47 @@ async function sendChatMessage(event, documentId) {
         const data = await response.json();
         chatSpinner.style.display = 'none';
 
+        // Update token badge if usage data returned
+        if (data.demoUsage && typeof isGuestDemo !== 'undefined' && isGuestDemo) {
+            demoTokenUsage = data.demoUsage.used;
+            const badgeUsed = document.getElementById('demoTokensUsed');
+            if (badgeUsed) {
+                badgeUsed.textContent = demoTokenUsage;
+            }
+        }
+
         if (data.success) {
             // Add assistant message to chat
             const assistantMessageDiv = document.createElement('div');
             assistantMessageDiv.className = 'mb-3';
             assistantMessageDiv.innerHTML = `
-                <div class="d-inline-block p-2 rounded bg-light" style="max-width: 85%;">
-                    <small class="d-block mb-1 fw-bold">Assistant</small>
-                    <div>${data.response}</div>
+                <div class="d-inline-block p-3 rounded-3 shadow-sm bg-white border" style="max-width: 85%;">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-robot me-2"></i>
+                        <small class="fw-bold opacity-75">Assistant</small>
+                        <small class="ms-auto opacity-50">${new Date().toLocaleTimeString()}</small>
+                    </div>
+                    <div style="white-space: pre-wrap;">${escapeHtml(data.response)}</div>
                 </div>
             `;
             chatContainer.appendChild(assistantMessageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // If this response reached the demo limit
+            if (data.limitReached) {
+                lockChatForDemoLimit();
+                setTimeout(() => {
+                    showDemoLimitPopup();
+                }, 500);
+            }
         } else {
-            showAlert(data.message || 'Failed to send message', 'danger');
+            // Check if server rejected due to limit reached
+            if (data.limitReached || response.status === 403) {
+                lockChatForDemoLimit();
+                showDemoLimitPopup();
+            } else {
+                showAlert(data.message || 'Failed to send message', 'danger');
+            }
         }
     } catch (error) {
         console.error('Chat error:', error);
@@ -115,6 +186,40 @@ async function sendChatMessage(event, documentId) {
         showAlert('Failed to send message. Please try again.', 'danger');
     }
 }
+
+// Utility to escape HTML in user/assistant messages to prevent XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Wire up event listeners for demo modal on DOM ready
+document.addEventListener('DOMContentLoaded', function () {
+    const closeBtn = document.getElementById('closeDemoPopupBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', hideDemoLimitPopup);
+    }
+    const popup = document.getElementById('demoLimitPopup');
+    if (popup) {
+        popup.addEventListener('click', function (e) {
+            if (e.target === popup) {
+                hideDemoLimitPopup();
+            }
+        });
+    }
+
+    // If initial page load already at or past limit
+    if (typeof isGuestDemo !== 'undefined' && isGuestDemo && typeof demoTokenLimit !== 'undefined') {
+        if (demoTokenUsage >= demoTokenLimit) {
+            lockChatForDemoLimit();
+        }
+    }
+});
 
 // Update document category
 async function updateCategory(documentId, category) {

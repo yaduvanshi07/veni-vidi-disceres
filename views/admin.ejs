@@ -90,50 +90,96 @@
         </div>
     </div>
 
-    <!-- Recent Users Card -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
-            <h5 class="mb-0 fw-bold">
-                <i class="bi bi-people me-2 text-primary"></i>Recent Users
-            </h5>
+    <div class="row mb-4">
+        <!-- Add Institution Card -->
+        <div class="col-lg-5 mb-4 mb-lg-0">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-bank2 me-2 text-primary"></i>Add Institution
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div id="alertContainer"></div>
+                    <form id="addInstForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="instName" class="form-label fw-semibold">Institution Name</label>
+                            <input type="text" class="form-control" id="instName" name="name" required placeholder="e.g. Stanford University">
+                        </div>
+                        <div class="mb-3">
+                            <label for="instType" class="form-label fw-semibold">Type</label>
+                            <select class="form-select" id="instType" name="type">
+                                <option value="University">University</option>
+                                <option value="College">College</option>
+                                <option value="School">School</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="instDesc" class="form-label fw-semibold">Description</label>
+                            <textarea class="form-control" id="instDesc" name="description" rows="2" placeholder="Brief description..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="instLogo" class="form-label fw-semibold">Logo Image</label>
+                            <input type="file" class="form-control" id="instLogo" name="logo" accept="image/*">
+                            <div class="form-text">JPEG, PNG, GIF, or WEBP up to 5MB</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="submitInstBtn">
+                            <span class="spinner-border spinner-border-sm me-2 d-none" id="instBtnSpinner"></span>
+                            <i class="bi bi-plus-circle me-1"></i>Create Institution
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="card-body p-4">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="border-0">Username</th>
-                            <th class="border-0">Email</th>
-                            <th class="border-0">Role</th>
-                            <th class="border-0">Joined</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% recentUsers.forEach(user => { %>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
-                                            <i class="bi bi-person text-primary"></i>
-                                        </div>
-                                        <span class="fw-semibold"><%= user.username %></span>
-                                    </div>
-                                </td>
-                                <td><%= user.email %></td>
-                                <td>
-                                    <span class="badge bg-<%= user.role === 'admin' ? 'danger' : 'secondary' %>">
-                                        <i class="bi bi-shield-<%= user.role === 'admin' ? 'check' : 'fill' %> me-1"></i><%= user.role %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <small class="text-muted">
-                                        <i class="bi bi-calendar me-1"></i><%= new Date(user.createdAt).toLocaleDateString() %>
-                                    </small>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
+
+        <!-- Recent Users Card -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pb-0 pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-people me-2 text-primary"></i>Recent Users
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">Username</th>
+                                    <th class="border-0">Email</th>
+                                    <th class="border-0">Role</th>
+                                    <th class="border-0">Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% recentUsers.forEach(user => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                                    <i class="bi bi-person text-primary"></i>
+                                                </div>
+                                                <span class="fw-semibold"><%= user.username %></span>
+                                            </div>
+                                        </td>
+                                        <td><%= user.email %></td>
+                                        <td>
+                                            <span class="badge bg-<%= user.role === 'admin' ? 'danger' : 'secondary' %>">
+                                                <i class="bi bi-shield-<%= user.role === 'admin' ? 'check' : 'fill' %> me-1"></i><%= user.role %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar me-1"></i><%= new Date(user.createdAt).toLocaleDateString() %>
+                                            </small>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -200,5 +246,63 @@
         </div>
     </div>
 </main>
+
+<script>
+    document.getElementById('addInstForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const submitBtn = document.getElementById('submitInstBtn');
+        const spinner = document.getElementById('instBtnSpinner');
+        const alertContainer = document.getElementById('alertContainer');
+        
+        // Reset states
+        alertContainer.innerHTML = '';
+        submitBtn.disabled = true;
+        spinner.classList.remove('d-none');
+        
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch('/api/institutions', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center animate__animated animate__fadeIn" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <div>Institution "${result.data.name}" added successfully!</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                form.reset();
+            } else {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center animate__animated animate__fadeIn" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div>${result.message || 'Failed to add institution.'}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error adding institution:', error);
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center animate__animated animate__fadeIn" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>An unexpected error occurred. Please try again.</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+        } finally {
+            submitBtn.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    });
+</script>
 
 <%- include('partials/footer') %>

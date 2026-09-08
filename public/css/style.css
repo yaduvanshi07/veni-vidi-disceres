@@ -644,7 +644,7 @@ body.dark-mode .btn-ghost:hover {
 }
 
 .btn-pill-gradient {
-    background: linear-gradient(135deg, #FF9933 0%, #00CED1 100%);
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%);
     border: none;
     border-radius: 50px;
     font-weight: 600;
@@ -652,7 +652,9 @@ body.dark-mode .btn-ghost:hover {
     position: relative;
     z-index: 1;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(255, 153, 51, 0.3);
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.30);
+    transition: all 0.3s ease;
 }
 
 .btn-pill-gradient::before {
@@ -662,16 +664,16 @@ body.dark-mode .btn-ghost:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #00CED1 0%, #FF9933 100%);
+    background: linear-gradient(135deg, #B8BEC7 0%, #FFA533 100%);
     opacity: 0;
     z-index: -1;
     transition: opacity 0.3s ease;
 }
 
 .btn-pill-gradient:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 15px rgba(0, 206, 209, 0.4);
-    color: white !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 18px rgba(209, 213, 219, 0.45);
+    color: #2b1e00 !important;
 }
 
 .btn-pill-gradient:hover::before {
@@ -736,4 +738,159 @@ body.dark-mode .btn-ghost:hover {
 /* Divider Override */
 .footer-premium hr {
     border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   GLOBAL BUTTON GRADIENT OVERRIDE
+   Light Saffron (#FFBB66) → Light Grey (#D1D5DB)
+   Applied to all Bootstrap button variants
+   ========================================= */
+
+/* Primary */
+.btn-primary {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.28);
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background: linear-gradient(135deg, #FFA533 0%, #B8BEC7 100%) !important;
+    border-color: transparent !important;
+    color: #2b1e00 !important;
+    box-shadow: 0 6px 16px rgba(209, 213, 219, 0.42) !important;
+    transform: translateY(-1px);
+}
+
+/* Success */
+.btn-success {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.28);
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+    background: linear-gradient(135deg, #FFA533 0%, #B8BEC7 100%) !important;
+    border-color: transparent !important;
+    color: #2b1e00 !important;
+    box-shadow: 0 6px 16px rgba(209, 213, 219, 0.42) !important;
+    transform: translateY(-1px);
+}
+
+/* Info */
+.btn-info {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.28);
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active {
+    background: linear-gradient(135deg, #FFA533 0%, #B8BEC7 100%) !important;
+    border-color: transparent !important;
+    color: #2b1e00 !important;
+    box-shadow: 0 6px 16px rgba(209, 213, 219, 0.42) !important;
+    transform: translateY(-1px);
+}
+
+/* Light */
+.btn-light {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.28);
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-light:hover,
+.btn-light:focus,
+.btn-light:active {
+    background: linear-gradient(135deg, #FFA533 0%, #B8BEC7 100%) !important;
+    border-color: transparent !important;
+    color: #2b1e00 !important;
+    box-shadow: 0 6px 16px rgba(209, 213, 219, 0.42) !important;
+    transform: translateY(-1px);
+}
+
+/* Outline-Primary */
+.btn-outline-primary {
+    background: transparent !important;
+    border: 1.5px solid #FFBB66 !important;
+    color: #c07000 !important;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.28) !important;
+    transform: translateY(-1px);
+}
+
+/* Outline-Success */
+.btn-outline-success {
+    background: transparent !important;
+    border: 1.5px solid #FFBB66 !important;
+    color: #c07000 !important;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-outline-success:hover,
+.btn-outline-success:focus,
+.btn-outline-success:active {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.28) !important;
+    transform: translateY(-1px);
+}
+
+/* Outline-Light (used on dark hero backgrounds) */
+.btn-outline-light {
+    background: transparent !important;
+    border: 1.5px solid rgba(255, 187, 102, 0.7) !important;
+    color: #ffe8c0 !important;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-outline-light:hover,
+.btn-outline-light:focus,
+.btn-outline-light:active {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.28) !important;
+    transform: translateY(-1px);
+}
+
+/* Outline-Secondary */
+.btn-outline-secondary {
+    background: transparent !important;
+    border: 1.5px solid #D1D5DB !important;
+    color: #555 !important;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active {
+    background: linear-gradient(135deg, #FFBB66 0%, #D1D5DB 100%) !important;
+    border-color: transparent !important;
+    color: #3d2b00 !important;
+    box-shadow: 0 4px 12px rgba(255, 187, 102, 0.22) !important;
+    transform: translateY(-1px);
 }
